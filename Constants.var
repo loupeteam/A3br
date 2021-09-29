@@ -1,0 +1,11 @@
+(*//********************************************************************************
+// Author:    Josh Polansky
+// Created:   January 29, 2020
+//*********************************************************************************)
+VAR CONSTANT
+	A3BR_MAI_REQUEST_PARS : UINT := 19;
+	A3BR_IO_STR_LEN : UINT := 80;
+	A3BR_SYMBOL_STR_LEN : UINT := 80;
+	A3BR_STR_ROWS4 : UINT := 19; (*	*)
+	A3BR_STR_ROWS20 : UINT := 19; (*	*)
+END_VAR

@@ -1,0 +1,11 @@
+{
+  "name": "a3br",
+  "version": "1.0.0",
+  "description": "Library is provided by Loupe\r https://loupe.team\r info@loupe.team\r 1-800-240-7042",
+  "main": "abb.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?AutomationStudio Version=4.5.5.113 SP?>
+<Library Version="0.03.3" SubType="ANSIC" xmlns="http://br-automation.co.at/AS/Library">
+  <Files>
+    <File>LICENSE.md</File>
+    <File>README.md</File>
+    <File Description="Exported data types">Types.typ</File>
+    <File Description="Exported constants">Constants.var</File>
+    <File Description="Exported functions and function blocks">A3br.fun</File>
+    <File>A3brCommon.h</File>
+    <File>A3brWebService.c</File>
+    <File>A3brControl.c</File>
+    <File>A3brProgramControl.c</File>
+    <File>A3brSetIO.c</File>
+    <File>A3brGetIO.c</File>
+    <File>A3brGetSymbol.c</File>
+    <File>A3brSetSymbol.c</File>
+    <File>A3brGetState.c</File>
+    <File>A3brIOWatch.c</File>
+    <File>A3brUtility.c</File>
+    <File>md5.h</File>
+    <File>md5.c</File>
+    <File>digest.h</File>
+    <File>digest.c</File>
+  </Files>
+  <Dependencies>
+    <Dependency ObjectName="AsHttp" />
+    <Dependency ObjectName="jsmn_parse" FromVersion="1.03.0" ToVersion="1.03.9" />
+    <Dependency ObjectName="RingBufLib" FromVersion="0.02.4" ToVersion="0.02.9" />
+    <Dependency ObjectName="standard" />
+    <Dependency ObjectName="StringExt" FromVersion="0.12.1" ToVersion="0.14.9" />
+    <Dependency ObjectName="sys_lib" />
+  </Dependencies>
+</Library>
