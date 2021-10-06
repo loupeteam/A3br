@@ -163,7 +163,9 @@ END_FUNCTION_BLOCK
 FUNCTION_BLOCK A3brGetState (*Read high level state information from the IRC.*)
 	VAR_INPUT
 		ident : UDINT;
-		execute : BOOL;
+		enable : BOOL;
+		mode : A3BR_GET_STATE_MODE_enum;
+		cycleTime : UDINT;
 	END_VAR
 	VAR_OUTPUT
 		rapidExecutionState : A3BR_RAPID_EXEC_ST_enum;
@@ -172,6 +174,7 @@ FUNCTION_BLOCK A3brGetState (*Read high level state information from the IRC.*)
 		operationalMode : A3BR_OP_MODE_enum;
 		busy : BOOL;
 		done : BOOL;
+		successCount : UDINT;
 		error : BOOL;
 		errorID : UINT;
 		errorString : STRING[80];

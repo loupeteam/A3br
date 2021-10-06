@@ -88,7 +88,6 @@ TYPE
 	END_STRUCT;
 	A3brWebServiceLink_typ : 	STRUCT 
 		requestBuffer : Buffer_typ;
-		stateRequest : UDINT;
 	END_STRUCT;
 	A3brProgramControlInternal_typ : 	STRUCT 
 		done : BOOL;
@@ -118,10 +117,12 @@ TYPE
 		done : BOOL;
 		busy : BOOL;
 		error : BOOL;
+		successCount : UDINT;
 		errorID : UINT;
 		errorString : STRING[80];
-		_cmd : BOOL;
-		stateRequest : UDINT;
+		oldUpdate : BOOL;
+		update : BOOL;
+		updateTimer : TON;
 	END_STRUCT;
 	A3brSetSymbolInternal_typ : 	STRUCT 
 		done : BOOL;
@@ -249,5 +250,10 @@ TYPE
 		(
 		A3BR_REQ_DATA_TYPE_PARS := 0,
 		A3BR_REQ_DATA_TYPE_BLOCK := 1
+		);
+	A3BR_GET_STATE_MODE_enum : 
+		(
+		A3BR_GET_STATE_MODE_SINGLE,
+		A3BR_GET_STATE_MODE_CONTINUOUS
 		);
 END_TYPE

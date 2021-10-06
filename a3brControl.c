@@ -73,7 +73,6 @@ void A3brControl(struct A3brControl* inst){
 
 		//Pass request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request );						
-		connection->stateRequest = clock_ms();
 	}
 	else if( !inst->powerOn ){
 		inst->internal._powerOn = 0;
@@ -103,7 +102,6 @@ void A3brControl(struct A3brControl* inst){
 
 		//Pass request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request );						
-		connection->stateRequest = clock_ms();
 	}
 	else if( !inst->powerOff ){
 		inst->internal._powerOff = 0;
@@ -159,7 +157,6 @@ void A3brControl(struct A3brControl* inst){
 
 		//Pass request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request);
-		connection->stateRequest = clock_ms();
 	}
 	else if( !inst->start ){
 		inst->internal._start = 0;
@@ -187,8 +184,7 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 
 		//Pass request to A3brWebService for processing.
-		BufferAddToBottom( &connection->requestBuffer, &request);					
-		connection->stateRequest = clock_ms();		
+		BufferAddToBottom( &connection->requestBuffer, &request);							
 	}
 	else if( !inst->stop ){
 		inst->internal._stop = 0;
@@ -216,7 +212,6 @@ void A3brControl(struct A3brControl* inst){
 
 		//Pass request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request);
-		connection->stateRequest = clock_ms();
 	}
 	else if( !inst->reset ){
 		inst->internal._reset= 0;
