@@ -170,9 +170,11 @@ void A3brGetStateFinalSuccessCallback( struct A3brGetState* inst, httpResponseHe
 	
 	// Since this is the last request, these values can now be correctly updated. 
 	inst->internal.error = 0;
-	inst->internal.done = 1;
+	if( inst->mode == A3BR_GET_STATE_MODE_SINGLE ){
+		inst->internal.done = 1;
+	}
 	inst->internal.busy = 0;
-
+	inst->internal.successCount++;
 }
 
 void A3brGetState(struct A3brGetState* inst){
@@ -184,8 +186,27 @@ void A3brGetState(struct A3brGetState* inst){
 		return;
 	}
 	
-	if( ((inst->execute && !inst->internal._cmd) ||	(connection->stateRequest > inst->internal.stateRequest)) && !inst->internal.busy ){
-		inst->internal._cmd = 1;
+	if( inst->enable ){
+		switch( inst->mode ) {
+			case A3BR_GET_STATE_MODE_SINGLE:
+				inst->internal.update = 1;
+				break;
+			case A3BR_GET_STATE_MODE_CONTINUOUS:
+				inst->internal.updateTimer.IN = (!inst->internal.updateTimer.Q);
+				inst->internal.updateTimer.PT = inst->cycleTime;
+				inst->internal.update = inst->internal.updateTimer.Q;	
+				break;
+		}
+	}
+	
+	TON(&inst->internal.updateTimer);
+	
+	if( !inst->internal.update ){
+		inst->internal.oldUpdate = 0;
+	}
+	
+	if( inst->internal.update && !inst->internal.oldUpdate ){
+		inst->internal.oldUpdate = 1;
 		
 		//Report busy status during operation.
 		inst->internal.error = 0;
@@ -221,17 +242,19 @@ void A3brGetState(struct A3brGetState* inst){
 		//Pass third request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request);
 		
-		inst->internal.stateRequest = clock_ms();
 	}
 	
 	inst->busy = inst->internal.busy;
 	inst->done = inst->internal.done;
+	inst->successCount = inst->internal.successCount;
 	inst->error = inst->internal.error;
 	inst->errorID = inst->internal.errorID;
 	brsstrcpy(inst->errorString, inst->internal.errorString);
 	
-	if( !inst->execute ){
-		inst->internal._cmd = 0;
+	if( !inst->enable ){
+		inst->internal.update = 0;
+		inst->internal.oldUpdate = 0;
+		inst->internal.updateTimer.IN = 0;
 		inst->rapidExecutionState = A3BR_RAPID_EXEC_ST_UNDEFINED;
 		inst->rapidCycleState = A3BR_RAPID_CYCLE_ST_UNDEFINED;
 		inst->operationalMode = A3BR_OP_MODE_UNDEFINED;
