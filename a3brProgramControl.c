@@ -22,14 +22,14 @@
 //#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
 //#pragma GCC diagnostic ignored "-Wreturn-type"
 
-void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data);
-void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data);
-void A3brProgramControlErrorCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data);
-void A3brProgramControlSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data);
+void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, HttpHeader_typ * header, unsigned char * data);
+void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, HttpHeader_typ * header, unsigned char * data);
+void A3brProgramControlErrorCallback( struct A3brProgramControl* inst, HttpHeader_typ * header, unsigned char * data);
+void A3brProgramControlSuccessCallback( struct A3brProgramControl* inst, HttpHeader_typ * header, unsigned char * data);
 
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brProgramControlErrorCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brProgramControlErrorCallback( struct A3brProgramControl* inst, HttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -38,14 +38,14 @@ void A3brProgramControlErrorCallback( struct A3brProgramControl* inst, httpRespo
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brProgramControlSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brProgramControlSuccessCallback( struct A3brProgramControl* inst, HttpHeader_typ * header, unsigned char * data){
 	
 	inst->internal.error = 0;
 	inst->internal.done = 1;
 	inst->internal.busy = 0;
 }
 
-void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, HttpHeader_typ * header, unsigned char * data){
 
 	A3brWebServiceLink_typ *connection = inst->ident;
 
@@ -70,7 +70,7 @@ void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, httpRespo
 
 }
 
-void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, HttpHeader_typ * header, unsigned char * data){
 
 	A3brWebServiceLink_typ *connection = inst->ident;
 

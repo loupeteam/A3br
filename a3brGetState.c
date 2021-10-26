@@ -117,7 +117,7 @@ signed short A3brGetRapidParse(struct A3brGetState *data, jsmn_callback_data *da
 }
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brGetStateErrorCallback( struct A3brGetState* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brGetStateErrorCallback( struct A3brGetState* inst, HttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -126,7 +126,7 @@ void A3brGetStateErrorCallback( struct A3brGetState* inst, httpResponseHeader_t 
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brGetStateSuccessCallback( struct A3brGetState* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brGetStateSuccessCallback( struct A3brGetState* inst, HttpHeader_typ * header, unsigned char * data){
 	
 	// Declare the data, tokens, and parser
 	jsmn_parser parser;
@@ -149,7 +149,7 @@ void A3brGetStateSuccessCallback( struct A3brGetState* inst, httpResponseHeader_
 }
 
 //This gets called by A3brWebService once the last HTTP request has completed successfully. 
-void A3brGetStateFinalSuccessCallback( struct A3brGetState* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brGetStateFinalSuccessCallback( struct A3brGetState* inst, HttpHeader_typ * header, unsigned char * data){
 	
 	// Declare the data, tokens, and parser
 	jsmn_parser parser;

@@ -13,4 +13,4 @@
 	};
 #endif
 
-typedef void (* A3brCallback)( UDINT, httpResponseHeader_t * header, unsigned char * data);
+typedef void (* A3brCallback)( UDINT, HttpHeader_typ * header, unsigned char * data);

@@ -63,20 +63,17 @@ TYPE
 	END_STRUCT;
 	A3brWebServiceConnection_typ : 	STRUCT 
 		reqState : A3BR_REQUEST_ST_enum;
-		httpClient : httpClient;
-		rawReqHeader : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
-		rawResHeader : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
+		httpClient : HttpClient;
+		httpRequest : HttpRequest;
 		reqData : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
 		resData : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
-		reqHeader : httpRequestHeader_t;
-		resHeader : httpResponseHeader_t;
+		reqHeader : ARRAY[0..HTTP_MAI_NUM_HEADER_LINES]OF HttpHeaderLine_typ;
 		retries : UINT;
 		responseTimeout : TON;
 		currentRequest : A3brWebServiceRequest_typ;
 		connected : BOOL;
 		ping : TON;
 		sent : BOOL;
-		httpStats : httpStatistics_t;
 		httpStatus : UINT;
 		prevClientStatus : UINT;
 	END_STRUCT;

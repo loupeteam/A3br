@@ -36,7 +36,7 @@
 //userlog : Log changes on controller {true | false), set if the setting shall be logged as Event log. Default value is 'false'
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brSetSymbolErrorCallback( struct A3brSetSymbol* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brSetSymbolErrorCallback( struct A3brSetSymbol* inst, HttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -45,7 +45,7 @@ void A3brSetSymbolErrorCallback( struct A3brSetSymbol* inst, httpResponseHeader_
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brSetSymbolSuccessCallback( struct A3brSetSymbol* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brSetSymbolSuccessCallback( struct A3brSetSymbol* inst, HttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 0;
 	inst->internal.done = 1;
 	inst->internal.busy = 0;
