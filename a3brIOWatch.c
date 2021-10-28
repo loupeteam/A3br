@@ -43,7 +43,9 @@ void A3brIOWatchErrorCallback( struct A3brIOWatchIOInternal_typ* inst, HttpHeade
 	inst->error= 1;
 	inst->busy= 0;
 	inst->errorID = A3BR_ERR_HTTP_ERROR;
-	brsstrcpy(inst->errorString, header->status);	
+	STRING tempString[20];
+	brsitoa(header->status, &tempString);
+	brsstrcpy(inst->errorString, tempString);	
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
@@ -117,7 +119,7 @@ void A3brIOWatch(struct A3brIOWatch* inst){
 			A3brWebServiceRequest_typ request;
 			brsmemset(&request, 0, sizeof(request));
 			request.self = inst;
-			request.method = httpMETHOD_GET; 
+			request.method = HTTP_METHOD_GET; 
 			request.errorCallback = &A3brIOWatchErrorCallback;
 			request.successCallback = &A3brIOWatchSuccessCallback;
 	
@@ -155,7 +157,7 @@ void A3brIOWatch(struct A3brIOWatch* inst){
 					A3brWebServiceRequest_typ request;
 					brsmemset(&request, 0, sizeof(request));	
 					request.self = &(pIOPoints[i]);
-					request.method = httpMETHOD_POST; 
+					request.method = HTTP_METHOD_POST; 
 					request.errorCallback = &A3brIOWatchErrorCallback;
 //					request.successCallback = &A3brIOWatchSuccessCallback;
 					brsstrcpy( request.uri, "/rw/iosystem/signals/");

@@ -41,7 +41,9 @@ void A3brSetIOErrorCallback( struct A3brSetIO* inst, HttpHeader_typ * header, un
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
 	inst->internal.errorID = A3BR_ERR_HTTP_ERROR;
-	brsstrcpy(inst->internal.errorString, header->status);
+	STRING tempString[20];
+	brsitoa(header->status, &tempString);
+	brsstrcpy(inst->internal.errorString, tempString);
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
@@ -72,7 +74,7 @@ void A3brSetIO(struct A3brSetIO* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = httpMETHOD_POST; 
+		request.method = HTTP_METHOD_POST; 
 		brsstrcpy( request.uri, "/rw/iosystem/signals/" );
 		brsstrcat( request.uri, inst->pSignal );
 		brsstrcat( request.uri, "?action=set&json=1" );	
