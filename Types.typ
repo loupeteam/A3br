@@ -75,7 +75,6 @@ TYPE
 		ping : TON;
 		sent : BOOL;
 		httpStatus : UINT;
-		prevClientStatus : UINT;
 	END_STRUCT;
 	A3brWebServiceAuthRequest_typ : 	STRUCT 
 		uri : STRING[80];

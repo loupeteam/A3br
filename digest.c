@@ -79,30 +79,32 @@ void getDigestParameters( const unsigned char *auth, unsigned char *realm, unsig
 	return;		
 }
 
-unsigned long getCookie( const unsigned char *cookie, unsigned char *httpSession, unsigned char *abbcx){
+unsigned long getCookie( HttpHeaderLine_typ *buf, unsigned char *httpSession, unsigned char *abbcx){
 	
-//	HTTP/1.1 200 OK
-//	Set-Cookie: -http-session-=7::http.session::2c07adcb8b7fb7e586f7d85e77a64519; path=/; domain=127.0.0.1; httponly
-//	Set-Cookie: ABBCX=17; path=/; domain=127.0.0.1; httponly
-//	Vary: Accept-Encoding
-//	X-Frame-Options: SAMEORIGIN
-//	Content-Type: application/json
-//	X-Content-Type-Options: nosniff
-//	Date: Tue, 21 Jan 2020 18:04:13 GMT
-//	Cache-Control: no-cache="set-cookie", max-age=0, no-cache, no-store
-//	Content-Length: 1262
-//	X-XSS-Protection: 1; mode=block
-//	Connection: Keep-Alive
-//	Pragma: no-cache
-//	Expires: -1
-//	Accept-Ranges: bytes
+	//	HTTP/1.1 200 OK
+	//	Set-Cookie: -http-session-=7::http.session::2c07adcb8b7fb7e586f7d85e77a64519; path=/; domain=127.0.0.1; httponly
+	//	Set-Cookie: ABBCX=17; path=/; domain=127.0.0.1; httponly
+	//	Vary: Accept-Encoding
+	//	X-Frame-Options: SAMEORIGIN
+	//	Content-Type: application/json
+	//	X-Content-Type-Options: nosniff
+	//	Date: Tue, 21 Jan 2020 18:04:13 GMT
+	//	Cache-Control: no-cache="set-cookie", max-age=0, no-cache, no-store
+	//	Content-Length: 1262
+	//	X-XSS-Protection: 1; mode=block
+	//	Connection: Keep-Alive
+	//	Pragma: no-cache
+	//	Expires: -1
+	//	Accept-Ranges: bytes
 
-	if(!cookie) return 0;
-	getCookieParameter(strstr(cookie, "-http-session-"),httpSession);
-	getCookieParameter(strstr(cookie, "ABBCX"),abbcx);
-	if(cookie) cookie++;
-	return cookie;		
+	if(!buf) return 0;
+	if (!brsstrcmp(buf->name, "set-cookie")) {	
+		getCookieParameter(strstr(buf->value, "-http-session-"),httpSession);
+		getCookieParameter(strstr(buf->value, "ABBCX"),abbcx);
+	}
+	return;	
 }
+
 void MD5(unsigned char const *buf, unsigned char *digest){
 
 	struct MD5Context context;
@@ -188,16 +190,16 @@ void digestAuth(unsigned char *username,unsigned char *realm,unsigned char * pas
 
 	memset( buf,0,sizeof(buf));
 	switch(method){
-		case 1:
+		case HTTP_METHOD_GET:
 			strcat( buf, "GET");
 			break;
-		case 2:
+		case HTTP_METHOD_POST:
 			strcat( buf, "POST");
 			break;
-		case 3:
+		case HTTP_METHOD_PUT:
 			strcat( buf, "PUT");
 			break;
-		case 4:
+		case HTTP_METHOD_DELETE:
 			strcat( buf, "DELETE");
 			break;
 	}
