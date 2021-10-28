@@ -69,33 +69,23 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 	{
 		inst->inited = 1;
 		for (i = 0; i < MAX_HTTP_CONNECTIONS; i++)
-		{
-			
+		{			
 			//Assign initial parameters to HTTP blocks.
 			inst->connection[i].httpRequest.pUserHeader = &inst->connection[i].reqHeader;
-			inst->connection[i].httpRequest.pResponse = &inst->connection[i].resData;
-//
-//			inst->connection[i].resHeader.rawHeader.pData = &inst->connection[i].rawResHeader;
-//			inst->connection[i].resHeader.rawHeader.dataSize = sizeof(inst->connection[i].rawResHeader);
-//
-//			inst->connection[i].httpClient.pResponseHeader = &inst->connection[i].resHeader;
-//			inst->connection[i].httpClient.pResponseData = &inst->connection[i].resData;
-//			inst->connection[i].httpClient.responseDataSize = sizeof(inst->connection[i].resData);
-//			inst->connection[i].httpClient.pStatistics = &inst->connection[i].httpStats;
-			
+			inst->connection[i].httpRequest.pResponse = &inst->connection[i].resData;	
+			inst->connection[i].httpRequest.responseSize = sizeof(inst->connection[i].resData);
 		}
 	}
 
 	inst->activeConnections = 0;
 	int status;
 	A3brCallback pCallback;
+	INT tempStatus;
 	for (i = 0; i < MAX_HTTP_CONNECTIONS; i++)
 	{
 		
 		brsstrcpy(inst->connection[i].httpClient.configuration.hostname, configuration->hostname);
 		inst->connection[i].httpClient.configuration.port = configuration->port;
-//		inst->connection[i].httpClient.configuration.localIPAddress = ...;
-//		inst->connection[i].httpClient.configuration.localPort = ;
 		
 		if (inst->connection[i].httpClient.connected) {
 			inst->connection[i].httpRequest.ident = inst->connection[i].httpClient.ident;
@@ -129,7 +119,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 			{
 				brsmemset(&inst->connection[i].currentRequest, 0, sizeof(inst->connection[i].currentRequest));
 				brsstrcpy(inst->connection[i].currentRequest.uri, "/?json=1");
-				inst->connection[i].currentRequest.method = httpMETHOD_GET;
+				inst->connection[i].currentRequest.method = HTTP_METHOD_GET;
 
 				inst->connection[i].reqState = A3BR_REQUEST_ST_GENERATE_STRING;
 			}
@@ -140,6 +130,11 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 
 		//Generate the request string.
 		case A3BR_REQUEST_ST_GENERATE_STRING:
+				
+			//Clear out the header
+			brsmemset(inst->connection[i].reqHeader, 0, sizeof(inst->connection[i].reqHeader));
+			addHeaderLine(&inst->connection[i].reqHeader, "connection", "keep-alive");
+			addHeaderLine(&inst->connection[i].reqHeader, "keep-alive", "timeout=60");
 
 			if (inst->connection[i].currentRequest.dataType == A3BR_REQ_DATA_TYPE_PARS)
 			{
@@ -165,15 +160,16 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 					}
 				}
 				inst->connection[i].httpRequest.pContent = &inst->connection[i].reqData;
-				inst->connection[i].httpRequest.contentLength = brsstrlen(&inst->connection[i].reqData);					
-				brsstrcpy(inst->connection[i].httpRequest.contentType, "application/x-www-form-urlencoded");
+				inst->connection[i].httpRequest.contentLength = brsstrlen(&inst->connection[i].reqData);
+				addHeaderLine(&inst->connection[i].reqHeader, "content-type", "application/x-www-form-urlencoded");
+				inst->connection[i].reqState = A3BR_REQUEST_ST_SEND;
 			}
 			else if (inst->connection[i].currentRequest.dataType == A3BR_REQ_DATA_TYPE_BLOCK)
 			{
 				inst->connection[i].httpRequest.pContent = inst->connection[i].currentRequest.pBlock;
 				inst->connection[i].httpRequest.contentLength = inst->connection[i].currentRequest.szBlock;
 				brsstrcpy(inst->connection[i].reqData, "Request data is being handled by an external structure");
-				brsstrcpy(inst->connection[i].httpRequest.contentType, "text/plain");
+				addHeaderLine(&inst->connection[i].reqHeader, "content-type", "text/plain");
 				inst->connection[i].reqState = A3BR_REQUEST_ST_SEND;
 			}
 
@@ -184,14 +180,6 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 		case A3BR_REQUEST_ST_SEND:
 			if (inst->authState == A3BR_AUTH_ST_READY && !inst->connection[i].httpRequest.busy)
 			{					
-//				brsstrcpy(inst->connection[i].reqHeader[0].name, "Connection");
-//				brsstrcpy(inst->connection[i].reqHeader[0].value, "keep-alive");
-//				brsstrcpy(inst->connection[i].reqHeader[1].name, "Keep-Alive");
-//				brsstrcpy(inst->connection[i].reqHeader[1].value, "timeout=60");	
-//				brsstrcpy(inst->connection[i].reqHeader[2].name, "Via");
-//				brsstrcpy(inst->connection[i].reqHeader[2].value, "HTTP/1.1");
-				inst->connection[i].httpRequest.numUserHeaders = 0;
-
 				brsstrcpy(inst->connection[i].httpRequest.uri, inst->connection[i].currentRequest.uri);
 				inst->connection[i].httpRequest.method = inst->connection[i].currentRequest.method;
 
@@ -205,72 +193,65 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 			}
 			
 		//Wait for the server to send back the response and process it.
-		case A3BR_REQUEST_ST_PROCESS_RESPONSE:
-
-			switch (inst->connection[i].httpRequest.header.status)
-			{
-			case 0:
-				//Wait here for a non-zero response.
-				inst->connection[i].responseTimeout.IN = 1;
-
-				if (inst->connection[i].responseTimeout.Q)
+			case A3BR_REQUEST_ST_PROCESS_RESPONSE:
+				tempStatus = inst->connection[i].httpRequest.done ? inst->connection[i].httpRequest.header.status : 0;		
+				switch (tempStatus)
 				{
-					if (inst->connection[i].retries > 5)
-					{
-						inst->connection[i].httpRequest.send = 0;
+					case 0:
+						//Wait here for a non-zero response.
+						inst->connection[i].responseTimeout.IN = 1;
+
+						if (inst->connection[i].responseTimeout.Q)
+						{
+							if (inst->connection[i].retries > 5)
+							{
+								//There was an error of some sort fulfilling the request, proceed to call the errorCallback.
+								inst->connection[i].reqState = A3BR_REQUEST_ST_IDLE;
+								// XTODO: fix feedback. 
+							//	brsstrcpy(inst->connection[i].httpRequest.header.status, "Timeout while waiting for server response to request");
+								if (inst->connection[i].currentRequest.errorCallback)
+								{
+									pCallback = (A3brCallback)inst->connection[i].currentRequest.errorCallback;
+									pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData);
+								}
+							}
+							else
+							{
+								inst->connection[i].responseTimeout.IN = 0;
+								inst->connection[i].retries++;
+								inst->connection[i].httpRequest.send = 1;
+							}
+						}
+						break;
+					case 200: // HTTP code for "OK"
+					case 201: // HTTP code for "Created"
+					case 204: // HTTP code for "OK, but no return content"
+						//The request was successfully fulfilled, proceed to call successCallback.
+						inst->connection[i].reqState = A3BR_REQUEST_ST_IDLE;
+						if (inst->connection[i].currentRequest.successCallback)
+						{
+							pCallback = (A3brCallback)inst->connection[i].currentRequest.successCallback;
+							pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData);
+						}
+						break;
+					case 503:
+					case 401: // HTTP code for "Unauthorized"
+						//Getting here means that we were successfully authenticated at one point in time, and that the IRC5
+						//somehow lost that authentication (maybe is was rebooted). We need to allow the authentication to take
+						//place and then let this request run again.
+						inst->connection[i].reqState = A3BR_REQUEST_ST_SEND;
+						break;
+					default:
 						//There was an error of some sort fulfilling the request, proceed to call the errorCallback.
 						inst->connection[i].reqState = A3BR_REQUEST_ST_IDLE;
-						// XTODO
-						brsstrcpy(inst->connection[i].httpRequest.header.status, "Timeout while waiting for server response to request");
 						if (inst->connection[i].currentRequest.errorCallback)
 						{
 							pCallback = (A3brCallback)inst->connection[i].currentRequest.errorCallback;
 							pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData);
 						}
-					}
-					else
-					{
-						// XTODO: does it need to reset send for a scan first? 
-						if( inst->connection[i].httpRequest.done ){
-							inst->connection[i].responseTimeout.IN = 0;
-							inst->connection[i].retries++;
-							inst->connection[i].httpRequest.send = 1;												
-						}
-						else{
-							inst->connection[i].httpRequest.send = 0;						
-						}
-					}
+						break;
 				}
 				break;
-			case 200: // HTTP code for "OK"
-			case 201: // HTTP code for "Created"
-			case 204: // HTTP code for "OK, but no return content"
-				//The request was successfully fulfilled, proceed to call successCallback.
-				inst->connection[i].reqState = A3BR_REQUEST_ST_IDLE;
-				if (inst->connection[i].currentRequest.successCallback)
-				{
-					pCallback = (A3brCallback)inst->connection[i].currentRequest.successCallback;
-					pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData);
-				}
-				break;
-			case 503:
-			case 401: // HTTP code for "Unauthorized"
-				//Getting here means that we were successfully authenticated at one point in time, and that the IRC5
-				//somehow lost that authentication (maybe is was rebooted). We need to allow the authentication to take
-				//place and then let this request run again.
-				inst->connection[i].reqState = A3BR_REQUEST_ST_SEND;
-				break;
-			default:
-				//There was an error of some sort fulfilling the request, proceed to call the errorCallback.
-				inst->connection[i].reqState = A3BR_REQUEST_ST_IDLE;
-				if (inst->connection[i].currentRequest.errorCallback)
-				{
-					pCallback = (A3brCallback)inst->connection[i].currentRequest.errorCallback;
-					pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData);
-				}
-				break;
-			}
-			break;
 		}
 
 		inst->connection[i].responseTimeout.PT = inst->connection[i].responseTimeout.PT ? inst->connection[i].responseTimeout.PT : 500;
@@ -299,14 +280,10 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 				//Use separate data for the auth so as to not overwrite a valid request.. We should get back to it once auth is ok
 				brsstrcpy(inst->connection[i].httpRequest.uri, inst->authRequest.uri);
 				
-				inst->connection[i].httpRequest.method = HTTP_METHOD_GET;
-//				brsstrcpy(inst->connection[i].reqHeader[0].name, "Connection");
-//				brsstrcpy(inst->connection[i].reqHeader[0].value, "keep-alive");
-//				brsstrcpy(inst->connection[i].reqHeader[1].name, "Keep-Alive");
-//				brsstrcpy(inst->connection[i].reqHeader[1].value, "timeout=60");	
-//				brsstrcpy(inst->connection[i].reqHeader[2].name, "Via");
-//				brsstrcpy(inst->connection[i].reqHeader[2].value, "HTTP/1.1");
+				inst->connection[i].httpRequest.method = HTTP_METHOD_GET;	
 				
+				//Clear out the header
+				brsmemset(inst->connection[i].reqHeader, 0, sizeof(inst->connection[i].reqHeader));
 				inst->connection[i].httpRequest.numUserHeaders = 0;
 	
 				connection->httpRequest.send = 1;
@@ -335,16 +312,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 				
 				//Use separate data for the auth so as to not overwrite a valid request.. We should get back to it once auth is ok
 				brsstrcpy(connection->httpRequest.uri, inst->authRequest.uri);
-
-				connection->httpRequest.method = HTTP_METHOD_GET;
-			
-//				brsstrcpy(inst->connection[i].reqHeader[0].name, "Connection");
-//				brsstrcpy(inst->connection[i].reqHeader[0].value, "keep-alive");
-//				brsstrcpy(inst->connection[i].reqHeader[1].name, "Keep-Alive");
-//				brsstrcpy(inst->connection[i].reqHeader[1].value, "timeout=60");	
-//				brsstrcpy(inst->connection[i].reqHeader[2].name, "Via");
-//				brsstrcpy(inst->connection[i].reqHeader[2].value, "HTTP/1.1");
-				inst->connection[i].httpRequest.numUserHeaders = 0;
+				inst->connection[i].httpRequest.method = HTTP_METHOD_GET;
 
 				inst->authState = A3BR_AUTH_ST_AUTHENTICATE_SENT;
 
@@ -359,28 +327,29 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 					brsstrcpy(inst->errorString, "Timeout waiting for server to reply with authentication information");
 					inst->authState = A3BR_AUTH_ST_ERROR;
 				}
+			
 			//Authentication parameters are available, append them to the next HTTP request.
 			case A3BR_AUTH_ST_READY:
 
 				if (connection->httpRequest.send)
 				{
-					//Clear out the header
-					brsmemset(inst->connection[i].reqHeader, 0, sizeof(inst->connection[i].reqHeader));
 					//If we have cookies, use them
 					if (brsstrlen(inst->auth.httpSession) > 0)
-					{
-						brsstrcpy(inst->connection[i].reqHeader[0].name, "Cookie");
-						brsstrcpy(inst->connection[i].reqHeader[0].value, "-http-session-=");
-						brsstrcat(inst->connection[i].reqHeader[0].value, inst->auth.httpSession);
-						brsstrcat(inst->connection[i].reqHeader[0].value, ";");
+					{					
+						STRING headerValue[HTTP_MAX_LEN_HEADER_VALUE];
+						//	brsstrcpy(inst->connection[i].reqHeader[0].name, "Cookie");
+						brsstrcpy(headerValue, "-http-session-=");
+						brsstrcat(headerValue, inst->auth.httpSession);
+						brsstrcat(headerValue, ";");
 						//If we have cookies, use them
 						if (brsstrlen(inst->auth.ABBCX) > 0)
 						{
-							brsstrcat(inst->connection[i].reqHeader[0].value, "ABBCX=");
-							brsstrcat(inst->connection[i].reqHeader[0].value, inst->auth.ABBCX);
-							brsstrcat(inst->connection[i].reqHeader[0].value, ";");
-							//brsstrcat(rawReqHeader, ";\r\n");
+							brsstrcat(headerValue, "ABBCX=");
+							brsstrcat(headerValue, inst->auth.ABBCX);
+							brsstrcat(headerValue, ";");
 						}
+						addHeaderLine(&inst->connection[i].reqHeader, "Cookie", headerValue);
+						inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
 					}
 					//Do the authorization
 					else if (brsstrcmp(inst->auth.qop, "auth") == 0)
@@ -394,9 +363,8 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 						digestAuth(inst->auth.userName, inst->auth.realm, inst->auth.password, connection->httpRequest.method, connection->httpRequest.uri, inst->auth.nonce, inst->auth.nc, inst->auth.cnonce, inst->auth.qop, inst->auth.digest);
 						STRING authHeader[3000];
 						generateDigestAuthorization(&inst->auth, connection->httpRequest.uri, authHeader);
-						brsstrcpy(inst->connection[i].reqHeader[0].name, "Authorization");
-						brsstrcpy(inst->connection[i].reqHeader[0].value, authHeader);
-						inst->connection[i].httpRequest.numUserHeaders = 1;
+						addHeaderLine(&inst->connection[i].reqHeader, "Authorization", authHeader);
+						inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
 					}	
 				}
 				break;
@@ -412,41 +380,19 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 				}
 				break;
 		}
-
-		inst->connection[i].sent = inst->connection[i].httpRequest.send;
-		HttpClient(&inst->connection[i].httpClient);
-		HttpRequest(&inst->connection[i].httpRequest);
-
-
 		
-		inst->connection[i].httpStatus = inst->connection[i].httpRequest.header.status;
-		inst->connection[i].httpRequest.send = 0;
+		inst->connection[i].sent = inst->connection[i].httpRequest.send;
 
-		inst->connection[i].connected = inst->connection[i].httpClient.connected;
-		if (inst->connection[i].connected)
-		{
-			inst->activeConnections++;
-		}
-	}
-
-	inst->authTimeout.PT = 5000;
-	TON(&inst->authTimeout);
-	inst->authTimeout.IN = 0;
-
-	//Go through all the connection and see if Authentication is good
-	// Use MAI_HTTP_CONNECTIONS + 1 to account for the dedicated Auth Client
-	for (i = 0; i < MAX_HTTP_CONNECTIONS; i++)
-	{
+		//Go through all the connection and see if Authentication is good
+		//Use MAI_HTTP_CONNECTIONS + 1 to account for the dedicated Auth Client
 		//Handles transitioning to the correct authentication state based on the response from the server.
 		//If 200 is returned, this indicates successful authentication. If 401 is returned, this means that
 		//the server did not authorize the request, and authentication must be carried out.
-		A3brWebServiceConnection_typ *connection = &inst->connection[i];
-
 		if (connection->httpRequest.done)
-		{					
-			for (int counter = 0; counter < HTTP_MAI_NUM_HEADER_LINES; counter++) 
-			{
-				getCookie(&connection->httpRequest.header.lines[counter], inst->auth.httpSession, inst->auth.ABBCX);
+		{								
+			// Search for cookies in the response, and record them if found (for future authentication). 
+			for (int i = 0; i <= HTTP_MAI_NUM_HEADER_LINES; i++) {
+				getCookie(&connection->httpRequest.header.lines[i], inst->auth.httpSession, inst->auth.ABBCX);
 			}
 
 			switch (connection->httpRequest.header.status)
@@ -461,11 +407,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 					brsmemset(inst->auth.httpSession, 0, sizeof(inst->auth.httpSession));
 					brsmemset(inst->auth.ABBCX, 0, sizeof(inst->auth.ABBCX));
 					int headerIndex = HttpgetHeaderIndex(&connection->httpRequest.header.lines, "www-authenticate", 0);
-					//	for (int counter = 0; counter < HTTP_MAI_NUM_HEADER_LINES; counter++) {
-					//		if (!brsstrcmp(connection->httpRequest.header.lines[counter].name, "WWW-Authenticate")) {
 					getDigestParameters(&connection->httpRequest.header.lines[headerIndex].value, inst->auth.realm, inst->auth.qop, inst->auth.nonce, inst->auth.opaque);
-					//		}
-					//	}
 					inst->authState = A3BR_AUTH_ST_AUTHENTICATE;
 					break;
 				case 503:
@@ -484,9 +426,44 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 					}
 			}
 		}
+		
+		HttpClient(&inst->connection[i].httpClient);
+		HttpRequest(&inst->connection[i].httpRequest);
+		
+		inst->connection[i].httpRequest.send = 0;
+
+		inst->connection[i].httpStatus = inst->connection[i].httpRequest.header.status;
+
+		inst->connection[i].connected = inst->connection[i].httpClient.connected;
+		if (inst->connection[i].connected)
+		{
+			inst->activeConnections++;
+		}	
 	}
+	
+	inst->authTimeout.PT = 5000;
+	TON(&inst->authTimeout);
+	inst->authTimeout.IN = 0;
 
 	inst->connected = (inst->authState == A3BR_AUTH_ST_READY);
 
 	inst->_reset = inst->reset;
+}
+
+void addHeaderLine(HttpHeaderLine_typ * headerLine, char * name, char * value) {
+	for (int i = 0; i <= HTTP_MAI_NUM_HEADER_LINES; i++) {
+		if (!brsstrcmp(headerLine[i].name, "")) {
+			brsstrcpy(headerLine[i].name, name);
+			brsstrcpy(headerLine[i].value, value);
+			return;			
+		}
+	}
+}
+
+int getNumHeaders(HttpHeaderLine_typ * headerLine) {
+	for (int i = 0; i <= HTTP_MAI_NUM_HEADER_LINES; i++) {
+		if (!brsstrcmp(headerLine[i].name, "")) {
+			return i;
+		}
+	}
 }
