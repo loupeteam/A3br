@@ -84,8 +84,8 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 	for (i = 0; i < MAX_HTTP_CONNECTIONS; i++)
 	{
 		
-		brsstrcpy(inst->connection[i].httpClient.configuration.hostname, configuration->hostname);
-		inst->connection[i].httpClient.configuration.port = configuration->port;
+		brsstrcpy(inst->connection[i].httpClient.hostname, configuration->hostname);
+		inst->connection[i].httpClient.port = configuration->port;
 		
 		if (inst->connection[i].httpClient.connected) {
 			inst->connection[i].httpRequest.ident = inst->connection[i].httpClient.ident;
@@ -119,7 +119,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 			{
 				brsmemset(&inst->connection[i].currentRequest, 0, sizeof(inst->connection[i].currentRequest));
 				brsstrcpy(inst->connection[i].currentRequest.uri, "/?json=1");
-				inst->connection[i].currentRequest.method = HTTP_METHOD_GET;
+				inst->connection[i].currentRequest.method = LLHTTP_METHOD_GET;
 
 				inst->connection[i].reqState = A3BR_REQUEST_ST_GENERATE_STRING;
 			}
@@ -280,7 +280,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 				//Use separate data for the auth so as to not overwrite a valid request.. We should get back to it once auth is ok
 				brsstrcpy(inst->connection[i].httpRequest.uri, inst->authRequest.uri);
 				
-				inst->connection[i].httpRequest.method = HTTP_METHOD_GET;	
+				inst->connection[i].httpRequest.method = LLHTTP_METHOD_GET;	
 				
 				//Clear out the header
 				brsmemset(inst->connection[i].reqHeader, 0, sizeof(inst->connection[i].reqHeader));
@@ -312,7 +312,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 				
 				//Use separate data for the auth so as to not overwrite a valid request.. We should get back to it once auth is ok
 				brsstrcpy(connection->httpRequest.uri, inst->authRequest.uri);
-				inst->connection[i].httpRequest.method = HTTP_METHOD_GET;
+				inst->connection[i].httpRequest.method = LLHTTP_METHOD_GET;
 
 				inst->authState = A3BR_AUTH_ST_AUTHENTICATE_SENT;
 
@@ -336,7 +336,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 					//If we have cookies, use them
 					if (brsstrlen(inst->auth.httpSession) > 0)
 					{					
-						STRING headerValue[HTTP_MAX_LEN_HEADER_VALUE];
+						STRING headerValue[LLHTTP_MAX_LEN_HEADER_VALUE];
 						//	brsstrcpy(inst->connection[i].reqHeader[0].name, "Cookie");
 						brsstrcpy(headerValue, "-http-session-=");
 						brsstrcat(headerValue, inst->auth.httpSession);
@@ -391,7 +391,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 		if (connection->httpRequest.done)
 		{								
 			// Search for cookies in the response, and record them if found (for future authentication). 
-			for (int i = 0; i <= HTTP_MAI_NUM_HEADER_LINES; i++) {
+			for (int i = 0; i <= LLHTTP_MAI_NUM_HEADER_LINES; i++) {
 				getCookie(&connection->httpRequest.header.lines[i], inst->auth.httpSession, inst->auth.ABBCX);
 			}
 
@@ -406,7 +406,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 					//Get the authentication parameters.
 					brsmemset(inst->auth.httpSession, 0, sizeof(inst->auth.httpSession));
 					brsmemset(inst->auth.ABBCX, 0, sizeof(inst->auth.ABBCX));
-					int headerIndex = HttpgetHeaderIndex(&connection->httpRequest.header.lines, "www-authenticate", 0);
+					int headerIndex = LLHttpgetHeaderIndex(&connection->httpRequest.header.lines, "www-authenticate", 0);
 					getDigestParameters(&connection->httpRequest.header.lines[headerIndex].value, inst->auth.realm, inst->auth.qop, inst->auth.nonce, inst->auth.opaque);
 					inst->authState = A3BR_AUTH_ST_AUTHENTICATE;
 					break;
@@ -427,8 +427,8 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 			}
 		}
 		
-		HttpClient(&inst->connection[i].httpClient);
-		HttpRequest(&inst->connection[i].httpRequest);
+		LLHttpClient(&inst->connection[i].httpClient);
+		LLHttpRequest(&inst->connection[i].httpRequest);
 		
 		inst->connection[i].httpRequest.send = 0;
 
@@ -450,8 +450,8 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 	inst->_reset = inst->reset;
 }
 
-void addHeaderLine(HttpHeaderLine_typ * headerLine, char * name, char * value) {
-	for (int i = 0; i <= HTTP_MAI_NUM_HEADER_LINES; i++) {
+void addHeaderLine(LLHttpHeaderField_typ * headerLine, char * name, char * value) {
+	for (int i = 0; i <= LLHTTP_MAI_NUM_HEADER_LINES; i++) {
 		if (!brsstrcmp(headerLine[i].name, "")) {
 			brsstrcpy(headerLine[i].name, name);
 			brsstrcpy(headerLine[i].value, value);
@@ -460,8 +460,8 @@ void addHeaderLine(HttpHeaderLine_typ * headerLine, char * name, char * value) {
 	}
 }
 
-int getNumHeaders(HttpHeaderLine_typ * headerLine) {
-	for (int i = 0; i <= HTTP_MAI_NUM_HEADER_LINES; i++) {
+int getNumHeaders(LLHttpHeaderField_typ * headerLine) {
+	for (int i = 0; i <= LLHTTP_MAI_NUM_HEADER_LINES; i++) {
 		if (!brsstrcmp(headerLine[i].name, "")) {
 			return i;
 		}

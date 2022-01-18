@@ -23,7 +23,7 @@
 //#pragma GCC diagnostic ignored "-Wreturn-type"
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brControlErrorCallback( struct A3brControl* inst, HttpHeader_typ * header, unsigned char * data){
+void A3brControlErrorCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -34,7 +34,7 @@ void A3brControlErrorCallback( struct A3brControl* inst, HttpHeader_typ * header
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brControlSuccessCallback( struct A3brControl* inst, HttpHeader_typ * header, unsigned char * data){
+void A3brControlSuccessCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data){
 	
 	inst->internal.error = 0;
 	inst->internal.done = 1;
@@ -64,7 +64,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = HTTP_METHOD_POST; 
+		request.method = LLHTTP_METHOD_POST; 
 		brsstrcpy( request.uri, "rw/panel/ctrlstate" );
 		brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -93,7 +93,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = HTTP_METHOD_POST; 
+		request.method = LLHTTP_METHOD_POST; 
 		brsstrcpy( request.uri, "rw/panel/ctrlstate" );
 		brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -130,7 +130,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = HTTP_METHOD_POST;
+		request.method = LLHTTP_METHOD_POST;
 		brsstrcpy( request.uri, "/rw/rapid/execution" );
 		brsstrcat( request.uri, "?action=start&json=1" );
 		
@@ -178,7 +178,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = HTTP_METHOD_POST;
+		request.method = LLHTTP_METHOD_POST;
 		brsstrcpy( request.uri, "/rw/rapid/execution");
 		brsstrcat( request.uri, "?action=stop&json=1");	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -205,7 +205,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = HTTP_METHOD_POST; 
+		request.method = LLHTTP_METHOD_POST; 
 		brsstrcpy( request.uri, "/rw/rapid/execution");
 		brsstrcat( request.uri, "?action=resetpp&json=1");	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -235,7 +235,7 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 		
 		//Create a folder to hold the new program files.	
-		request.method = HTTP_METHOD_POST; 						
+		request.method = LLHTTP_METHOD_POST; 						
 		brsstrcpy( request.uri, "/rw/mastership" );
 		brsstrcat( request.uri, "?action=request" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -262,7 +262,7 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 		
 		//Create a folder to hold the new program files.	
-		request.method = HTTP_METHOD_POST; 						
+		request.method = LLHTTP_METHOD_POST; 						
 		brsstrcpy( request.uri, "/rw/mastership" );
 		brsstrcat( request.uri, "?action=release&json=1" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;

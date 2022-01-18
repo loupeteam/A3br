@@ -30,7 +30,7 @@
     <Dependency ObjectName="standard" />
     <Dependency ObjectName="StringExt" FromVersion="0.12.1" ToVersion="0.14.9" />
     <Dependency ObjectName="sys_lib" />
-    <Dependency ObjectName="HTTPComm" />
+    <Dependency ObjectName="LLHttp" />
     <Dependency ObjectName="AsBrStr" />
   </Dependencies>
 </Library>

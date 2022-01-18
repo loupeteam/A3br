@@ -79,7 +79,7 @@ void getDigestParameters( const unsigned char *auth, unsigned char *realm, unsig
 	return;		
 }
 
-unsigned long getCookie( HttpHeaderLine_typ *buf, unsigned char *httpSession, unsigned char *abbcx){
+unsigned long getCookie( LLHttpHeaderField_typ *buf, unsigned char *httpSession, unsigned char *abbcx){
 	
 	//	HTTP/1.1 200 OK
 	//	Set-Cookie: -http-session-=7::http.session::2c07adcb8b7fb7e586f7d85e77a64519; path=/; domain=127.0.0.1; httponly
@@ -190,16 +190,16 @@ void digestAuth(unsigned char *username,unsigned char *realm,unsigned char * pas
 
 	memset( buf,0,sizeof(buf));
 	switch(method){
-		case HTTP_METHOD_GET:
+		case LLHTTP_METHOD_GET:
 			strcat( buf, "GET");
 			break;
-		case HTTP_METHOD_POST:
+		case LLHTTP_METHOD_POST:
 			strcat( buf, "POST");
 			break;
-		case HTTP_METHOD_PUT:
+		case LLHTTP_METHOD_PUT:
 			strcat( buf, "PUT");
 			break;
-		case HTTP_METHOD_DELETE:
+		case LLHTTP_METHOD_DELETE:
 			strcat( buf, "DELETE");
 			break;
 	}

@@ -38,7 +38,7 @@ signed short A3brGetIOParse(struct A3brGetIO *data, jsmn_callback_data *data2) {
 }
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brGetIOErrorCallback( struct A3brGetIO* inst, HttpHeader_typ * header, unsigned char * data){
+void A3brGetIOErrorCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -49,7 +49,7 @@ void A3brGetIOErrorCallback( struct A3brGetIO* inst, HttpHeader_typ * header, un
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brGetIOSuccessCallback( struct A3brGetIO* inst, HttpHeader_typ * header, unsigned char * data){
+void A3brGetIOSuccessCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data){
 	
 	// Declare the data, tokens, and parser
 	jsmn_parser parser;
@@ -95,7 +95,7 @@ void A3brGetIO(struct A3brGetIO* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = HTTP_METHOD_GET; 
+		request.method = LLHTTP_METHOD_GET; 
 		brsstrcpy( request.uri, "/rw/iosystem/signals/");
 		brsstrcat( request.uri, inst->pSignal);
 		brsstrcat( request.uri, "?json=1");	

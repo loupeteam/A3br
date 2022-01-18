@@ -65,7 +65,7 @@ signed short A3brGetSymbolParse(struct A3brGetSymbol *data, jsmn_callback_data *
 }
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brGetSymbolErrorCallback( struct A3brGetSymbol* inst, HttpHeader_typ * header, unsigned char * data){
+void A3brGetSymbolErrorCallback( struct A3brGetSymbol* inst, LLHttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -76,7 +76,7 @@ void A3brGetSymbolErrorCallback( struct A3brGetSymbol* inst, HttpHeader_typ * he
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brGetSymbolSuccessCallback( struct A3brGetSymbol* inst, HttpHeader_typ * header, unsigned char * data){
+void A3brGetSymbolSuccessCallback( struct A3brGetSymbol* inst, LLHttpHeader_typ * header, unsigned char * data){
 	
 	// Declare the data, tokens, and parser
 	jsmn_parser parser;
@@ -122,7 +122,7 @@ void A3brGetSymbol(struct A3brGetSymbol* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = HTTP_METHOD_GET; 
+		request.method = LLHTTP_METHOD_GET; 
 		brsstrcpy( request.uri, "/rw/rapid/symbol/data/");
 		brsstrcat( request.uri, inst->pSignal);
 		brsstrcat( request.uri, "?json=1");	

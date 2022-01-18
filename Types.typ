@@ -63,11 +63,11 @@ TYPE
 	END_STRUCT;
 	A3brWebServiceConnection_typ : 	STRUCT 
 		reqState : A3BR_REQUEST_ST_enum;
-		httpClient : HttpClient;
-		httpRequest : HttpRequest;
+		httpClient : LLHttpClient;
+		httpRequest : LLHttpRequest;
 		reqData : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
 		resData : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
-		reqHeader : ARRAY[0..HTTP_MAI_NUM_HEADER_LINES]OF HttpHeaderLine_typ;
+		reqHeader : ARRAY[0..LLHTTP_MAI_NUM_HEADER_LINES]OF LLHttpHeaderField_typ;
 		retries : UINT;
 		responseTimeout : TON;
 		currentRequest : A3brWebServiceRequest_typ;
