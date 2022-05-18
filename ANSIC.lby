@@ -25,7 +25,7 @@
   </Files>
   <Dependencies>
     <Dependency ObjectName="AsHttp" />
-    <Dependency ObjectName="jsmn_parse" FromVersion="1.03.0" ToVersion="1.04.9" />
+    <Dependency ObjectName="jsmn_parse" FromVersion="1.03.0" ToVersion="1.05.9" />
     <Dependency ObjectName="RingBufLib" FromVersion="0.02.4" ToVersion="0.02.9" />
     <Dependency ObjectName="standard" />
     <Dependency ObjectName="StringExt" FromVersion="0.12.1" ToVersion="0.14.9" />

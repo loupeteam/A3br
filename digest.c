@@ -5,11 +5,16 @@
 
 #include "string.h"
 
-#include <bur/plctypes.h>
-#ifdef _DEFAULT_INCLUDES
-#include <AsDefault.h>
+#ifdef __cplusplus
+	extern "C"
+	{
 #endif
 
+#include "A3br.h"
+
+#ifdef __cplusplus
+	};
+#endif
 
 /* Add prototype support.  */
 #ifndef PROTO
