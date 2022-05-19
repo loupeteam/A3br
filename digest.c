@@ -10,7 +10,9 @@
 	{
 #endif
 
+#include "bur.h"
 #include "A3br.h"
+#include "A3brCommon.h"
 
 #ifdef __cplusplus
 	};
@@ -249,27 +251,27 @@ void digestFromHeader( const char *buf, const char *username, const char * passw
 
 unsigned long generateDigestAuthorization( A3brDigestAuthentication_typ *auth, const char *uri , unsigned char * authHeader){
 	
-	brsstrcpy(authHeader, "Digest username=\"");
-	brsstrcat(authHeader,auth->userName);
-	brsstrcat(authHeader,"\", realm=\"");
-	brsstrcat(authHeader,auth->realm);
-	brsstrcat(authHeader,"\", nonce=\"");
-	brsstrcat(authHeader,auth->nonce);
-	brsstrcat(authHeader,"\", uri=\"");
-	brsstrcat(authHeader,uri);
-	brsstrcat(authHeader,"\", algorithm=\"");
-	brsstrcat(authHeader,"MD5");
-	brsstrcat(authHeader,"\", response=\"");
-	brsstrcat(authHeader,auth->digest);
-	brsstrcat(authHeader,"\", opaque=\"");
-	brsstrcat(authHeader,auth->opaque);
-	brsstrcat(authHeader,"\", qop=\"");
-	brsstrcat(authHeader,auth->qop);
-	brsstrcat(authHeader,"\", nc=");
-	brsstrcat(authHeader,auth->nc);
-	brsstrcat(authHeader,", cnonce=\"");
-	brsstrcat(authHeader,auth->cnonce);
-	brsstrcat(authHeader,"\"");
+	strcpy(authHeader, "Digest username=\"");
+	strcat(authHeader,auth->userName);
+	strcat(authHeader,"\", realm=\"");
+	strcat(authHeader,auth->realm);
+	strcat(authHeader,"\", nonce=\"");
+	strcat(authHeader,auth->nonce);
+	strcat(authHeader,"\", uri=\"");
+	strcat(authHeader,uri);
+	strcat(authHeader,"\", algorithm=\"");
+	strcat(authHeader,"MD5");
+	strcat(authHeader,"\", response=\"");
+	strcat(authHeader,auth->digest);
+	strcat(authHeader,"\", opaque=\"");
+	strcat(authHeader,auth->opaque);
+	strcat(authHeader,"\", qop=\"");
+	strcat(authHeader,auth->qop);
+	strcat(authHeader,"\", nc=");
+	strcat(authHeader,auth->nc);
+	strcat(authHeader,", cnonce=\"");
+	strcat(authHeader,auth->cnonce);
+	strcat(authHeader,"\"");
 	
 	return 0;
 	

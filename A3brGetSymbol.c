@@ -10,6 +10,8 @@
 	extern "C"
 	{
 #endif
+
+#include "bur.h"
 #include "A3br.h"
 #include "A3brCommon.h"
 #include <string.h>

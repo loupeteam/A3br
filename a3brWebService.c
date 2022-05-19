@@ -10,6 +10,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include "bur.h"
 #include "A3br.h"
 #include "digest.h"
 #include "A3brCommon.h"
