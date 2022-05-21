@@ -414,7 +414,10 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 					//Reset the connection
 					//inst->connection[i].httpClient.enable = 0;
 					//inst->authState = A3BR_AUTH_ST_INIT;
-					inst->authState = A3BR_AUTH_ST_READY;
+					brsmemset(inst->auth.httpSession, 0, sizeof(inst->auth.httpSession));
+					brsmemset(inst->auth.ABBCX, 0, sizeof(inst->auth.ABBCX));
+					inst->connection[i].httpClient.abort = 1;
+					inst->authState = A3BR_AUTH_ST_INIT;
 					break;
 				default:
 					//Catch errors related to authentication only.
@@ -431,6 +434,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 		LLHttpRequest(&inst->connection[i].httpRequest);
 		
 		inst->connection[i].httpRequest.send = 0;
+		inst->connection[i].httpClient.abort = 0;
 
 		inst->connection[i].httpStatus = inst->connection[i].httpRequest.header.status;
 
