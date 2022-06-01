@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<?AutomationStudio Version=4.5.5.113 SP?>
+<?AutomationStudio FileVersion="4.9"?>
 <Library Version="0.03.3" SubType="ANSIC" xmlns="http://br-automation.co.at/AS/Library">
   <Files>
     <File>LICENSE.md</File>
@@ -25,10 +25,12 @@
   </Files>
   <Dependencies>
     <Dependency ObjectName="AsHttp" />
-    <Dependency ObjectName="jsmn_parse" FromVersion="1.03.0" ToVersion="1.03.9" />
+    <Dependency ObjectName="jsmn_parse" FromVersion="1.03.0" ToVersion="1.04.9" />
     <Dependency ObjectName="RingBufLib" FromVersion="0.02.4" ToVersion="0.02.9" />
     <Dependency ObjectName="standard" />
     <Dependency ObjectName="StringExt" FromVersion="0.12.1" ToVersion="0.14.9" />
     <Dependency ObjectName="sys_lib" />
+    <Dependency ObjectName="LLHttp" />
+    <Dependency ObjectName="AsBrStr" />
   </Dependencies>
 </Library>

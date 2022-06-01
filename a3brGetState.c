@@ -117,16 +117,18 @@ signed short A3brGetRapidParse(struct A3brGetState *data, jsmn_callback_data *da
 }
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brGetStateErrorCallback( struct A3brGetState* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brGetStateErrorCallback( struct A3brGetState* inst, LLHttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
 	inst->internal.errorID = A3BR_ERR_HTTP_ERROR;
-	brsstrcpy(inst->internal.errorString, header->status);
+	STRING tempString[20];
+	brsitoa(header->status, &tempString);
+	brsstrcpy(inst->internal.errorString, tempString);
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brGetStateSuccessCallback( struct A3brGetState* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brGetStateSuccessCallback( struct A3brGetState* inst, LLHttpHeader_typ * header, unsigned char * data){
 	
 	// Declare the data, tokens, and parser
 	jsmn_parser parser;
@@ -149,7 +151,7 @@ void A3brGetStateSuccessCallback( struct A3brGetState* inst, httpResponseHeader_
 }
 
 //This gets called by A3brWebService once the last HTTP request has completed successfully. 
-void A3brGetStateFinalSuccessCallback( struct A3brGetState* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brGetStateFinalSuccessCallback( struct A3brGetState* inst, LLHttpHeader_typ * header, unsigned char * data){
 	
 	// Declare the data, tokens, and parser
 	jsmn_parser parser;
@@ -170,9 +172,11 @@ void A3brGetStateFinalSuccessCallback( struct A3brGetState* inst, httpResponseHe
 	
 	// Since this is the last request, these values can now be correctly updated. 
 	inst->internal.error = 0;
-	inst->internal.done = 1;
+	if( inst->mode == A3BR_GET_STATE_MODE_SINGLE ){
+		inst->internal.done = 1;
+	}
 	inst->internal.busy = 0;
-
+	inst->internal.successCount++;
 }
 
 void A3brGetState(struct A3brGetState* inst){
@@ -184,8 +188,27 @@ void A3brGetState(struct A3brGetState* inst){
 		return;
 	}
 	
-	if( ((inst->execute && !inst->internal._cmd) ||	(connection->stateRequest > inst->internal.stateRequest)) && !inst->internal.busy ){
-		inst->internal._cmd = 1;
+	if( inst->enable ){
+		switch( inst->mode ) {
+			case A3BR_GET_STATE_MODE_SINGLE:
+				inst->internal.update = 1;
+				break;
+			case A3BR_GET_STATE_MODE_CONTINUOUS:
+				inst->internal.updateTimer.IN = (!inst->internal.updateTimer.Q);
+				inst->internal.updateTimer.PT = inst->cycleTime;
+				inst->internal.update = inst->internal.updateTimer.Q;	
+				break;
+		}
+	}
+	
+	TON(&inst->internal.updateTimer);
+	
+	if( !inst->internal.update ){
+		inst->internal.oldUpdate = 0;
+	}
+	
+	if( inst->internal.update && !inst->internal.oldUpdate ){
+		inst->internal.oldUpdate = 1;
 		
 		//Report busy status during operation.
 		inst->internal.error = 0;
@@ -196,7 +219,7 @@ void A3brGetState(struct A3brGetState* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = httpMETHOD_GET; 
+		request.method = LLHTTP_METHOD_GET; 
 		request.errorCallback = &A3brGetStateErrorCallback;
 		request.successCallback = &A3brGetStateSuccessCallback;
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -221,17 +244,19 @@ void A3brGetState(struct A3brGetState* inst){
 		//Pass third request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request);
 		
-		inst->internal.stateRequest = clock_ms();
 	}
 	
 	inst->busy = inst->internal.busy;
 	inst->done = inst->internal.done;
+	inst->successCount = inst->internal.successCount;
 	inst->error = inst->internal.error;
 	inst->errorID = inst->internal.errorID;
 	brsstrcpy(inst->errorString, inst->internal.errorString);
 	
-	if( !inst->execute ){
-		inst->internal._cmd = 0;
+	if( !inst->enable ){
+		inst->internal.update = 0;
+		inst->internal.oldUpdate = 0;
+		inst->internal.updateTimer.IN = 0;
 		inst->rapidExecutionState = A3BR_RAPID_EXEC_ST_UNDEFINED;
 		inst->rapidCycleState = A3BR_RAPID_CYCLE_ST_UNDEFINED;
 		inst->operationalMode = A3BR_OP_MODE_UNDEFINED;

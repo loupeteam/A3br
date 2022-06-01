@@ -55,7 +55,7 @@ int getCookieParameter(const char *buf, char *value){
 	return 0;
 }
 
-void getDigestParameters( const unsigned char *buf, unsigned char *realm, unsigned char *qop, unsigned char *nonce, unsigned char *opaque){
+void getDigestParameters( const unsigned char *auth, unsigned char *realm, unsigned char *qop, unsigned char *nonce, unsigned char *opaque){
 	
 	//	HTTP/1.1 401 Unauthorized
 	//	Vary: Accept-Encoding
@@ -70,7 +70,7 @@ void getDigestParameters( const unsigned char *buf, unsigned char *realm, unsign
 	//	WWW-Authenticate: Digest realm="validusers@robapi.abb", domain="/", qop="auth", nonce="OGJkNjI0ODc0MDY5OGMwNzp2YWxpZHVzZXJzQHJvYmFwaS5hYmI6MTZmYjUwNThiYjM6Yw==", opaque="799d5", algorithm="MD5", stale="FALSE"
 	//	Accept-Ranges: bytes
 	
-	char *auth = strstr(buf, "WWW-Authenticate");
+//	char *auth = strstr(buf, "WWW-Authenticate");
 	if(!auth) return;
 	getParameter( strstr(auth, "realm"), realm);	
 	getParameter( strstr(auth, "qop"), qop);
@@ -79,32 +79,32 @@ void getDigestParameters( const unsigned char *buf, unsigned char *realm, unsign
 	return;		
 }
 
-unsigned long getCookie( const unsigned char *buf, unsigned char *httpSession, unsigned char *abbcx){
+unsigned long getCookie( LLHttpHeaderField_typ *buf, unsigned char *httpSession, unsigned char *abbcx){
 	
-//	HTTP/1.1 200 OK
-//	Set-Cookie: -http-session-=7::http.session::2c07adcb8b7fb7e586f7d85e77a64519; path=/; domain=127.0.0.1; httponly
-//	Set-Cookie: ABBCX=17; path=/; domain=127.0.0.1; httponly
-//	Vary: Accept-Encoding
-//	X-Frame-Options: SAMEORIGIN
-//	Content-Type: application/json
-//	X-Content-Type-Options: nosniff
-//	Date: Tue, 21 Jan 2020 18:04:13 GMT
-//	Cache-Control: no-cache="set-cookie", max-age=0, no-cache, no-store
-//	Content-Length: 1262
-//	X-XSS-Protection: 1; mode=block
-//	Connection: Keep-Alive
-//	Pragma: no-cache
-//	Expires: -1
-//	Accept-Ranges: bytes
+	//	HTTP/1.1 200 OK
+	//	Set-Cookie: -http-session-=7::http.session::2c07adcb8b7fb7e586f7d85e77a64519; path=/; domain=127.0.0.1; httponly
+	//	Set-Cookie: ABBCX=17; path=/; domain=127.0.0.1; httponly
+	//	Vary: Accept-Encoding
+	//	X-Frame-Options: SAMEORIGIN
+	//	Content-Type: application/json
+	//	X-Content-Type-Options: nosniff
+	//	Date: Tue, 21 Jan 2020 18:04:13 GMT
+	//	Cache-Control: no-cache="set-cookie", max-age=0, no-cache, no-store
+	//	Content-Length: 1262
+	//	X-XSS-Protection: 1; mode=block
+	//	Connection: Keep-Alive
+	//	Pragma: no-cache
+	//	Expires: -1
+	//	Accept-Ranges: bytes
 
 	if(!buf) return 0;
-	char *cookie = strstr(buf, "Set-Cookie:");
-	if(!cookie) return 0;
-	getCookieParameter(strstr(cookie, "-http-session-"),httpSession);
-	getCookieParameter(strstr(cookie, "ABBCX"),abbcx);
-	if(cookie) cookie++;
-	return cookie;		
+	if (!brsstrcmp(buf->name, "set-cookie")) {	
+		getCookieParameter(strstr(buf->value, "-http-session-"),httpSession);
+		getCookieParameter(strstr(buf->value, "ABBCX"),abbcx);
+	}
+	return;	
 }
+
 void MD5(unsigned char const *buf, unsigned char *digest){
 
 	struct MD5Context context;
@@ -190,16 +190,16 @@ void digestAuth(unsigned char *username,unsigned char *realm,unsigned char * pas
 
 	memset( buf,0,sizeof(buf));
 	switch(method){
-		case 1:
+		case LLHTTP_METHOD_GET:
 			strcat( buf, "GET");
 			break;
-		case 2:
+		case LLHTTP_METHOD_POST:
 			strcat( buf, "POST");
 			break;
-		case 3:
+		case LLHTTP_METHOD_PUT:
 			strcat( buf, "PUT");
 			break;
-		case 4:
+		case LLHTTP_METHOD_DELETE:
 			strcat( buf, "DELETE");
 			break;
 	}
@@ -244,7 +244,7 @@ void digestFromHeader( const char *buf, const char *username, const char * passw
 
 unsigned long generateDigestAuthorization( A3brDigestAuthentication_typ *auth, const char *uri , unsigned char * authHeader){
 	
-	brsstrcpy(authHeader, "Authorization: Digest username=\"");
+	brsstrcpy(authHeader, "Digest username=\"");
 	brsstrcat(authHeader,auth->userName);
 	brsstrcat(authHeader,"\", realm=\"");
 	brsstrcat(authHeader,auth->realm);

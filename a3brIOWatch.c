@@ -39,15 +39,17 @@ signed short A3brParseIOParse(struct A3brIOWatchIOInternal_typ *data, jsmn_callb
 }
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brIOWatchErrorCallback( struct A3brIOWatchIOInternal_typ* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brIOWatchErrorCallback( struct A3brIOWatchIOInternal_typ* inst, LLHttpHeader_typ * header, unsigned char * data){
 	inst->error= 1;
 	inst->busy= 0;
 	inst->errorID = A3BR_ERR_HTTP_ERROR;
-	brsstrcpy(inst->errorString, header->status);	
+	STRING tempString[20];
+	brsitoa(header->status, &tempString);
+	brsstrcpy(inst->errorString, tempString);	
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brIOWatchSuccessCallback( struct A3brIOWatchIOInternal_typ* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brIOWatchSuccessCallback( struct A3brIOWatchIOInternal_typ* inst, LLHttpHeader_typ * header, unsigned char * data){
 	
 	inst->error= 0;
 	inst->busy= 0;
@@ -117,7 +119,7 @@ void A3brIOWatch(struct A3brIOWatch* inst){
 			A3brWebServiceRequest_typ request;
 			brsmemset(&request, 0, sizeof(request));
 			request.self = inst;
-			request.method = httpMETHOD_GET; 
+			request.method = LLHTTP_METHOD_GET; 
 			request.errorCallback = &A3brIOWatchErrorCallback;
 			request.successCallback = &A3brIOWatchSuccessCallback;
 	
@@ -155,7 +157,7 @@ void A3brIOWatch(struct A3brIOWatch* inst){
 					A3brWebServiceRequest_typ request;
 					brsmemset(&request, 0, sizeof(request));	
 					request.self = &(pIOPoints[i]);
-					request.method = httpMETHOD_POST; 
+					request.method = LLHTTP_METHOD_POST; 
 					request.errorCallback = &A3brIOWatchErrorCallback;
 //					request.successCallback = &A3brIOWatchSuccessCallback;
 					brsstrcpy( request.uri, "/rw/iosystem/signals/");

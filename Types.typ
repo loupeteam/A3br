@@ -63,22 +63,18 @@ TYPE
 	END_STRUCT;
 	A3brWebServiceConnection_typ : 	STRUCT 
 		reqState : A3BR_REQUEST_ST_enum;
-		httpClient : httpClient;
-		rawReqHeader : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
-		rawResHeader : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
+		httpClient : LLHttpClient;
+		httpRequest : LLHttpRequest;
 		reqData : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
 		resData : ARRAY[0..A3BR_STR_ROWS20]OF STRING[80];
-		reqHeader : httpRequestHeader_t;
-		resHeader : httpResponseHeader_t;
+		reqHeader : ARRAY[0..LLHTTP_MAI_NUM_HEADER_LINES]OF LLHttpHeaderField_typ;
 		retries : UINT;
 		responseTimeout : TON;
 		currentRequest : A3brWebServiceRequest_typ;
 		connected : BOOL;
 		ping : TON;
 		sent : BOOL;
-		httpStats : httpStatistics_t;
 		httpStatus : UINT;
-		prevClientStatus : UINT;
 	END_STRUCT;
 	A3brWebServiceAuthRequest_typ : 	STRUCT 
 		uri : STRING[80];
@@ -88,7 +84,6 @@ TYPE
 	END_STRUCT;
 	A3brWebServiceLink_typ : 	STRUCT 
 		requestBuffer : Buffer_typ;
-		stateRequest : UDINT;
 	END_STRUCT;
 	A3brProgramControlInternal_typ : 	STRUCT 
 		done : BOOL;
@@ -118,10 +113,12 @@ TYPE
 		done : BOOL;
 		busy : BOOL;
 		error : BOOL;
+		successCount : UDINT;
 		errorID : UINT;
 		errorString : STRING[80];
-		_cmd : BOOL;
-		stateRequest : UDINT;
+		oldUpdate : BOOL;
+		update : BOOL;
+		updateTimer : TON;
 	END_STRUCT;
 	A3brSetSymbolInternal_typ : 	STRUCT 
 		done : BOOL;
@@ -249,5 +246,10 @@ TYPE
 		(
 		A3BR_REQ_DATA_TYPE_PARS := 0,
 		A3BR_REQ_DATA_TYPE_BLOCK := 1
+		);
+	A3BR_GET_STATE_MODE_enum : 
+		(
+		A3BR_GET_STATE_MODE_SINGLE,
+		A3BR_GET_STATE_MODE_CONTINUOUS
 		);
 END_TYPE

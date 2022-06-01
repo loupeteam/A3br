@@ -23,16 +23,18 @@
 //#pragma GCC diagnostic ignored "-Wreturn-type"
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brControlErrorCallback( struct A3brControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brControlErrorCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
 	inst->internal.errorID = A3BR_ERR_HTTP_ERROR;
-	brsstrcpy(inst->internal.errorString, header->status);
+	STRING tempString[20];
+	brsitoa(header->status, &tempString);
+	brsstrcpy(inst->internal.errorString, tempString);
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brControlSuccessCallback( struct A3brControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brControlSuccessCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data){
 	
 	inst->internal.error = 0;
 	inst->internal.done = 1;
@@ -62,7 +64,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = httpMETHOD_POST; 
+		request.method = LLHTTP_METHOD_POST; 
 		brsstrcpy( request.uri, "rw/panel/ctrlstate" );
 		brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -73,7 +75,6 @@ void A3brControl(struct A3brControl* inst){
 
 		//Pass request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request );						
-		connection->stateRequest = clock_ms();
 	}
 	else if( !inst->powerOn ){
 		inst->internal._powerOn = 0;
@@ -92,7 +93,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = httpMETHOD_POST; 
+		request.method = LLHTTP_METHOD_POST; 
 		brsstrcpy( request.uri, "rw/panel/ctrlstate" );
 		brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -103,7 +104,6 @@ void A3brControl(struct A3brControl* inst){
 
 		//Pass request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request );						
-		connection->stateRequest = clock_ms();
 	}
 	else if( !inst->powerOff ){
 		inst->internal._powerOff = 0;
@@ -130,7 +130,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = httpMETHOD_POST;
+		request.method = LLHTTP_METHOD_POST;
 		brsstrcpy( request.uri, "/rw/rapid/execution" );
 		brsstrcat( request.uri, "?action=start&json=1" );
 		
@@ -159,7 +159,6 @@ void A3brControl(struct A3brControl* inst){
 
 		//Pass request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request);
-		connection->stateRequest = clock_ms();
 	}
 	else if( !inst->start ){
 		inst->internal._start = 0;
@@ -179,7 +178,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = httpMETHOD_POST;
+		request.method = LLHTTP_METHOD_POST;
 		brsstrcpy( request.uri, "/rw/rapid/execution");
 		brsstrcat( request.uri, "?action=stop&json=1");	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -187,8 +186,7 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 
 		//Pass request to A3brWebService for processing.
-		BufferAddToBottom( &connection->requestBuffer, &request);					
-		connection->stateRequest = clock_ms();		
+		BufferAddToBottom( &connection->requestBuffer, &request);							
 	}
 	else if( !inst->stop ){
 		inst->internal._stop = 0;
@@ -207,7 +205,7 @@ void A3brControl(struct A3brControl* inst){
 		A3brWebServiceRequest_typ request;
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
-		request.method = httpMETHOD_POST; 
+		request.method = LLHTTP_METHOD_POST; 
 		brsstrcpy( request.uri, "/rw/rapid/execution");
 		brsstrcat( request.uri, "?action=resetpp&json=1");	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -216,7 +214,6 @@ void A3brControl(struct A3brControl* inst){
 
 		//Pass request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request);
-		connection->stateRequest = clock_ms();
 	}
 	else if( !inst->reset ){
 		inst->internal._reset= 0;
@@ -238,7 +235,7 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 		
 		//Create a folder to hold the new program files.	
-		request.method = httpMETHOD_POST; 						
+		request.method = LLHTTP_METHOD_POST; 						
 		brsstrcpy( request.uri, "/rw/mastership" );
 		brsstrcat( request.uri, "?action=request" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -265,7 +262,7 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 		
 		//Create a folder to hold the new program files.	
-		request.method = httpMETHOD_POST; 						
+		request.method = LLHTTP_METHOD_POST; 						
 		brsstrcpy( request.uri, "/rw/mastership" );
 		brsstrcat( request.uri, "?action=release&json=1" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;

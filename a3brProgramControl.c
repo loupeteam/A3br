@@ -22,30 +22,32 @@
 //#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
 //#pragma GCC diagnostic ignored "-Wreturn-type"
 
-void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data);
-void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data);
-void A3brProgramControlErrorCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data);
-void A3brProgramControlSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data);
+void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, LLHttpHeader_typ * header, unsigned char * data);
+void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, LLHttpHeader_typ * header, unsigned char * data);
+void A3brProgramControlErrorCallback( struct A3brProgramControl* inst, LLHttpHeader_typ * header, unsigned char * data);
+void A3brProgramControlSuccessCallback( struct A3brProgramControl* inst, LLHttpHeader_typ * header, unsigned char * data);
 
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brProgramControlErrorCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brProgramControlErrorCallback( struct A3brProgramControl* inst, LLHttpHeader_typ * header, unsigned char * data){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
 	inst->internal.errorID = A3BR_ERR_HTTP_ERROR;
-	brsstrcpy(inst->internal.errorString, header->status);
+	STRING tempString[20];
+	brsitoa(header->status, &tempString);
+	brsstrcpy(inst->internal.errorString, tempString);
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brProgramControlSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brProgramControlSuccessCallback( struct A3brProgramControl* inst, LLHttpHeader_typ * header, unsigned char * data){
 	
 	inst->internal.error = 0;
 	inst->internal.done = 1;
 	inst->internal.busy = 0;
 }
 
-void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, LLHttpHeader_typ * header, unsigned char * data){
 
 	A3brWebServiceLink_typ *connection = inst->ident;
 
@@ -56,7 +58,7 @@ void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, httpRespo
 	request.successCallback = &A3brCreateModuleSuccessCallback;	
 
 	//Create the RAPID module file.
-	request.method = httpMETHOD_PUT; 						
+	request.method = LLHTTP_METHOD_PUT; 						
 	brsstrcpy( request.uri, "/fileservice/$home/" );
 	brsstrcat( request.uri, inst->pModuleName );
 	brsstrcat( request.uri, "/" );
@@ -70,7 +72,7 @@ void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, httpRespo
 
 }
 
-void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, httpResponseHeader_t * header, unsigned char * data){
+void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, LLHttpHeader_typ * header, unsigned char * data){
 
 	A3brWebServiceLink_typ *connection = inst->ident;
 
@@ -81,7 +83,7 @@ void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, httpRespo
 	request.successCallback = &A3brProgramControlSuccessCallback;	
 
 	//Load the newly created module.
-	request.method = httpMETHOD_POST; 						
+	request.method = LLHTTP_METHOD_POST; 						
 	brsstrcpy( request.uri, "/rw/rapid/tasks/" );
 	brsstrcat( request.uri, inst->pTaskName );
 	brsstrcat( request.uri, "?action=loadmod&json=1" );	
@@ -156,7 +158,7 @@ void A3brProgramControl(struct A3brProgramControl* inst){
 		request.successCallback = &A3brProgramControlSuccessCallback;
 		
 		//Create a folder to hold the new program files.	
-		request.method = httpMETHOD_POST; 						
+		request.method = LLHTTP_METHOD_POST; 						
 		brsstrcpy( request.uri, "/fileservice/$home/" );
 		brsstrcat( request.uri, "?json=1" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -168,7 +170,7 @@ void A3brProgramControl(struct A3brProgramControl* inst){
 		BufferAddToBottom( &connection->requestBuffer, &request );	
 		
 		//Create the RAPID module file.
-		request.method = httpMETHOD_PUT; 						
+		request.method = LLHTTP_METHOD_PUT; 						
 		brsstrcpy( request.uri, "/fileservice/$home/" );
 		brsstrcat( request.uri, inst->pProgramName );
 		brsstrcat( request.uri, "/" );
@@ -181,7 +183,7 @@ void A3brProgramControl(struct A3brProgramControl* inst){
 		BufferAddToBottom( &connection->requestBuffer, &request );
 		
 		//Create the .pgf file.
-		request.method = httpMETHOD_PUT; 						
+		request.method = LLHTTP_METHOD_PUT; 						
 		brsstrcpy( request.uri, "/fileservice/$home/" );
 		brsstrcat( request.uri, inst->pProgramName );
 		brsstrcat( request.uri, "/" );
@@ -198,7 +200,7 @@ void A3brProgramControl(struct A3brProgramControl* inst){
 		BufferAddToBottom( &connection->requestBuffer, &request );				
 		
 		//Load the newly created program.
-		request.method = httpMETHOD_POST; 						
+		request.method = LLHTTP_METHOD_POST; 						
 		brsstrcpy( request.uri, "/rw/rapid/tasks/" );
 		brsstrcat( request.uri, inst->pTaskName );
 		brsstrcat( request.uri, "/program" );
@@ -266,7 +268,7 @@ void A3brProgramControl(struct A3brProgramControl* inst){
 		request.successCallback = &A3brCreateFolderSuccessCallback;	
 		
 		//Create a folder to hold the new module files.	
-		request.method = httpMETHOD_POST; 						
+		request.method = LLHTTP_METHOD_POST; 						
 		brsstrcpy( request.uri, "/fileservice/$home/" );
 		brsstrcat( request.uri, "?json=1" );	
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
