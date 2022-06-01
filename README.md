@@ -5,6 +5,8 @@ info@loupe.team
 1-800-240-7042
 
 # Change log
+- 0.3.4:
+    - Fix 503 bug by closing the connection if detected
 
 - 0.3.3-032921:
     - Add status enum 2 string functions
