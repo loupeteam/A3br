@@ -5,6 +5,9 @@ info@loupe.team
 1-800-240-7042
 
 # Change log
+- 0.3.5:
+    - Fix bug that would append auth or cookies many times on connection loss
+
 - 0.3.4:
     - Fix 503 bug by closing the connection if detected
 
