@@ -203,6 +203,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 
 						if (inst->connection[i].responseTimeout.Q)
 						{
+							inst->connection[i].responseTimeout.IN = 0;
 							if (inst->connection[i].retries > 5)
 							{
 								//There was an error of some sort fulfilling the request, proceed to call the errorCallback.
@@ -217,7 +218,6 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 							}
 							else
 							{
-								inst->connection[i].responseTimeout.IN = 0;
 								inst->connection[i].retries++;
 								inst->connection[i].httpRequest.send = 1;
 							}
@@ -331,41 +331,41 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 			//Authentication parameters are available, append them to the next HTTP request.
 			case A3BR_AUTH_ST_READY:
 
-				if (connection->httpRequest.send)
+				if (connection->httpRequest.send && inst->connection[i].retries == 0)
 				{
-					//If we have cookies, use them
-					if (brsstrlen(inst->auth.httpSession) > 0)
-					{					
-						STRING headerValue[LLHTTP_MAX_LEN_HEADER_VALUE];
-						//	brsstrcpy(inst->connection[i].reqHeader[0].name, "Cookie");
-						brsstrcpy(headerValue, "-http-session-=");
-						brsstrcat(headerValue, inst->auth.httpSession);
-						brsstrcat(headerValue, ";");
 						//If we have cookies, use them
-						if (brsstrlen(inst->auth.ABBCX) > 0)
-						{
-							brsstrcat(headerValue, "ABBCX=");
-							brsstrcat(headerValue, inst->auth.ABBCX);
+						if (brsstrlen(inst->auth.httpSession) > 0)
+						{					
+							STRING headerValue[LLHTTP_MAX_LEN_HEADER_VALUE];
+							//	brsstrcpy(inst->connection[i].reqHeader[0].name, "Cookie");
+							brsstrcpy(headerValue, "-http-session-=");
+							brsstrcat(headerValue, inst->auth.httpSession);
 							brsstrcat(headerValue, ";");
+							//If we have cookies, use them
+							if (brsstrlen(inst->auth.ABBCX) > 0)
+							{
+								brsstrcat(headerValue, "ABBCX=");
+								brsstrcat(headerValue, inst->auth.ABBCX);
+								brsstrcat(headerValue, ";");
+							}
+							addHeaderLine(&inst->connection[i].reqHeader, "Cookie", headerValue);
+							inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
 						}
-						addHeaderLine(&inst->connection[i].reqHeader, "Cookie", headerValue);
-						inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
-					}
-					//Do the authorization
-					else if (brsstrcmp(inst->auth.qop, "auth") == 0)
-					{
-						STRING nc[8];
-						brsitoa(++inst->auth.count, nc);
-						brsmemset(inst->auth.nc, 0, sizeof(inst->auth.nc));
-						brsmemset(inst->auth.nc, '0', sizeof(inst->auth.nc) - 1);
-						brsmemcpy(inst->auth.nc + sizeof(inst->auth.nc) - brsstrlen(nc) - 1, &nc, brsstrlen(nc));
+							//Do the authorization
+						else if (brsstrcmp(inst->auth.qop, "auth") == 0)
+						{
+							STRING nc[8];
+							brsitoa(++inst->auth.count, nc);
+							brsmemset(inst->auth.nc, 0, sizeof(inst->auth.nc));
+							brsmemset(inst->auth.nc, '0', sizeof(inst->auth.nc) - 1);
+							brsmemcpy(inst->auth.nc + sizeof(inst->auth.nc) - brsstrlen(nc) - 1, &nc, brsstrlen(nc));
 
-						digestAuth(inst->auth.userName, inst->auth.realm, inst->auth.password, connection->httpRequest.method, connection->httpRequest.uri, inst->auth.nonce, inst->auth.nc, inst->auth.cnonce, inst->auth.qop, inst->auth.digest);
-						STRING authHeader[3000];
-						generateDigestAuthorization(&inst->auth, connection->httpRequest.uri, authHeader);
-						addHeaderLine(&inst->connection[i].reqHeader, "Authorization", authHeader);
-						inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
-					}	
+							digestAuth(inst->auth.userName, inst->auth.realm, inst->auth.password, connection->httpRequest.method, connection->httpRequest.uri, inst->auth.nonce, inst->auth.nc, inst->auth.cnonce, inst->auth.qop, inst->auth.digest);
+							STRING authHeader[3000];
+							generateDigestAuthorization(&inst->auth, connection->httpRequest.uri, authHeader);
+							addHeaderLine(&inst->connection[i].reqHeader, "Authorization", authHeader);
+							inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
+					}
 				}
 				break;
 
