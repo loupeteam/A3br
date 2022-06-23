@@ -58,18 +58,28 @@ void A3brCreateFolderSuccessCallback( struct A3brProgramControl* inst, LLHttpHea
 	request.successCallback = &A3brCreateModuleSuccessCallback;	
 
 	//Create the RAPID module file.
-	request.method = LLHTTP_METHOD_PUT; 						
-	brsstrcpy( request.uri, "/fileservice/$home/" );
-	brsstrcat( request.uri, inst->pModuleName );
-	brsstrcat( request.uri, "/" );
-	brsstrcat( request.uri, inst->pModuleName );
-	brsstrcat( request.uri, ".mod" );
-	brsstrcat( request.uri, "?json=1" );	
+	request.method = LLHTTP_METHOD_PUT; 	
+	switch(apiVersion) {
+		case A3BR_API_VERSION_1:
+			brsstrcpy( request.uri, "/fileservice/$home/" );
+			brsstrcat( request.uri, inst->pModuleName );
+			brsstrcat( request.uri, "/" );
+			brsstrcat( request.uri, inst->pModuleName );
+			brsstrcat( request.uri, ".mod" );
+			brsstrcat( request.uri, "?json=1" );
+			break;
+		case A3BR_API_VERSION_2:
+			brsstrcpy( request.uri, "/fileservice/$home/" );
+			brsstrcat( request.uri, inst->pModuleName );
+			brsstrcat( request.uri, "/" );
+			brsstrcat( request.uri, inst->pModuleName );
+			brsstrcat( request.uri, ".mod" );
+			break;
+	}
 	request.dataType = A3BR_REQ_DATA_TYPE_BLOCK;
 	request.pBlock = inst->pData;
 	request.szBlock = inst->szData;
 	BufferAddToBottom( &connection->requestBuffer, &request );				
-
 }
 
 void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
@@ -83,20 +93,39 @@ void A3brCreateModuleSuccessCallback( struct A3brProgramControl* inst, LLHttpHea
 	request.successCallback = &A3brProgramControlSuccessCallback;	
 
 	//Load the newly created module.
-	request.method = LLHTTP_METHOD_POST; 						
-	brsstrcpy( request.uri, "/rw/rapid/tasks/" );
-	brsstrcat( request.uri, inst->pTaskName );
-	brsstrcat( request.uri, "?action=loadmod&json=1" );	
-	request.dataType = A3BR_REQ_DATA_TYPE_PARS;
-	brsmemset(&request.parameters, 0, sizeof(request.parameters));
-	brsstrcpy( request.parameters[0].name, "modulepath" );
-	brsstrcpy( request.parameters[0].value, "$home/" );		
-	brsstrcat( request.parameters[0].value, inst->pModuleName );
-	brsstrcat( request.parameters[0].value, "/");
-	brsstrcat( request.parameters[0].value, inst->pModuleName );
-	brsstrcat( request.parameters[0].value, ".mod" );
-	brsstrcpy( request.parameters[1].name, "replace" );
-	brsstrcpy( request.parameters[1].value, "true" );	
+	request.method = LLHTTP_METHOD_POST; 	
+	switch(apiVersion) {
+		case A3BR_API_VERSION_1:
+			brsstrcpy( request.uri, "/rw/rapid/tasks/" );
+			brsstrcat( request.uri, inst->pTaskName );
+			brsstrcat( request.uri, "?action=loadmod&json=1" );	
+			request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+			brsmemset(&request.parameters, 0, sizeof(request.parameters));
+			brsstrcpy( request.parameters[0].name, "modulepath" );
+			brsstrcpy( request.parameters[0].value, "$home/" );		
+			brsstrcat( request.parameters[0].value, inst->pModuleName );
+			brsstrcat( request.parameters[0].value, "/");
+			brsstrcat( request.parameters[0].value, inst->pModuleName );
+			brsstrcat( request.parameters[0].value, ".mod" );
+			brsstrcpy( request.parameters[1].name, "replace" );
+			brsstrcpy( request.parameters[1].value, "true" );
+			break;
+		case A3BR_API_VERSION_2:
+			brsstrcpy( request.uri, "/rw/rapid/tasks/" );
+			brsstrcat( request.uri, inst->pTaskName );
+			brsstrcat( request.uri, "/loadmod?mastership=implicit" );	
+			request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+			brsmemset(&request.parameters, 0, sizeof(request.parameters));
+			brsstrcpy( request.parameters[0].name, "modulepath" );
+			brsstrcpy( request.parameters[0].value, "$home/" );		
+			brsstrcat( request.parameters[0].value, inst->pModuleName );
+			brsstrcat( request.parameters[0].value, "/");
+			brsstrcat( request.parameters[0].value, inst->pModuleName );
+			brsstrcat( request.parameters[0].value, ".mod" );
+			brsstrcpy( request.parameters[1].name, "replace" );
+			brsstrcpy( request.parameters[1].value, "true" );
+			break;
+	}
 	BufferAddToBottom( &connection->requestBuffer, &request );	
 }
 
@@ -268,15 +297,26 @@ void A3brProgramControl(struct A3brProgramControl* inst){
 		request.successCallback = &A3brCreateFolderSuccessCallback;	
 		
 		//Create a folder to hold the new module files.	
-		request.method = LLHTTP_METHOD_POST; 						
-		brsstrcpy( request.uri, "/fileservice/$home/" );
-		brsstrcat( request.uri, "?json=1" );	
-		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
-		brsmemset(&request.parameters, 0, sizeof(request.parameters));
-		brsstrcpy(request.parameters[0].name, "fs-newname");
-		brsstrcpy(request.parameters[0].value, inst->pModuleName);
-		brsstrcpy(request.parameters[1].name, "fs-action");
-		brsstrcpy(request.parameters[1].value, "create");
+		request.method = LLHTTP_METHOD_POST; 	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/fileservice/$home/" );
+				brsstrcat( request.uri, "?json=1" );	
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsmemset(&request.parameters, 0, sizeof(request.parameters));
+				brsstrcpy(request.parameters[0].name, "fs-newname");
+				brsstrcpy(request.parameters[0].value, inst->pModuleName);
+				brsstrcpy(request.parameters[1].name, "fs-action");
+				brsstrcpy(request.parameters[1].value, "create");
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/fileservice/$home/create" );	
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsmemset(&request.parameters, 0, sizeof(request.parameters));
+				brsstrcpy(request.parameters[0].name, "fs-newname");
+				brsstrcpy(request.parameters[0].value, inst->pModuleName);
+				break;
+		}
 		BufferAddToBottom( &connection->requestBuffer, &request );
 				
 	}

@@ -148,7 +148,7 @@ void A3brControl(struct A3brControl* inst){
 				brsstrcat( request.uri, "?action=start&json=1" );
 				break;
 			case A3BR_API_VERSION_2:
-				brsstrcpy( request.uri, "/rw/rapid/execution/start" );
+				brsstrcpy( request.uri, "/rw/rapid/execution/start?mastership=implicit" );
 				break;
 		}		
 		//Pass in all required parameters for the start command.
@@ -202,7 +202,7 @@ void A3brControl(struct A3brControl* inst){
 				brsstrcat( request.uri, "?action=stop&json=1");	
 				break;
 			case A3BR_API_VERSION_2:
-				brsstrcpy( request.uri, "/rw/rapid/execution/stop");
+				brsstrcpy( request.uri, "/rw/rapid/execution/stop?mastership=implicit");
 				break;
 		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;

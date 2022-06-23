@@ -183,7 +183,14 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 				inst->connection[i].httpRequest.pContent = inst->connection[i].currentRequest.pBlock;
 				inst->connection[i].httpRequest.contentLength = inst->connection[i].currentRequest.szBlock;
 				brsstrcpy(inst->connection[i].reqData, "Request data is being handled by an external structure");
-				addHeaderLine(&inst->connection[i].reqHeader, "content-type", "text/plain");
+				switch(configuration->apiVersion) {
+					case A3BR_API_VERSION_1:
+						addHeaderLine(&inst->connection[i].reqHeader, "content-type", "text/plain");
+						break;
+					case A3BR_API_VERSION_2:
+						addHeaderLine(&inst->connection[i].reqHeader, "content-type", "text/plain;v=2.0");
+						break;
+				}
 				inst->connection[i].reqState = A3BR_REQUEST_ST_SEND;
 			}
 
