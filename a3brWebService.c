@@ -168,7 +168,14 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 				}
 				inst->connection[i].httpRequest.pContent = &inst->connection[i].reqData;
 				inst->connection[i].httpRequest.contentLength = brsstrlen(&inst->connection[i].reqData);
-				addHeaderLine(&inst->connection[i].reqHeader, "content-type", "application/x-www-form-urlencoded");
+				switch(configuration->apiVersion) {
+					case A3BR_API_VERSION_1:
+						addHeaderLine(&inst->connection[i].reqHeader, "content-type", "application/x-www-form-urlencoded");
+						break;
+					case A3BR_API_VERSION_2:
+						addHeaderLine(&inst->connection[i].reqHeader, "content-type", "application/x-www-form-urlencoded;v=2.0");
+						break;
+				}
 				inst->connection[i].reqState = A3BR_REQUEST_ST_SEND;
 			}
 			else if (inst->connection[i].currentRequest.dataType == A3BR_REQ_DATA_TYPE_BLOCK)

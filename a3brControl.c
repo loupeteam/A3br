@@ -65,11 +65,22 @@ void A3brControl(struct A3brControl* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST; 
-		brsstrcpy( request.uri, "rw/panel/ctrlstate" );
-		brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
-		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
-		brsstrcpy( request.parameters[0].name, "ctrl-state" );
-		brsstrcpy( request.parameters[0].value, "motoron" );
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "rw/panel/ctrlstate" );
+				brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsstrcpy( request.parameters[0].name, "ctrl-state" );
+				brsstrcpy( request.parameters[0].value, "motoron" );
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "rw/panel/ctrlstate" );
+				brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsstrcpy( request.parameters[0].name, "ctrl-state" );
+				brsstrcpy( request.parameters[0].value, "motoron" );
+				break;
+		}
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
 
@@ -131,9 +142,15 @@ void A3brControl(struct A3brControl* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST;
-		brsstrcpy( request.uri, "/rw/rapid/execution" );
-		brsstrcat( request.uri, "?action=start&json=1" );
-		
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/rapid/execution" );
+				brsstrcat( request.uri, "?action=start&json=1" );
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/rapid/execution/start" );
+				break;
+		}		
 		//Pass in all required parameters for the start command.
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		request.errorCallback = &A3brControlErrorCallback;
@@ -179,8 +196,15 @@ void A3brControl(struct A3brControl* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST;
-		brsstrcpy( request.uri, "/rw/rapid/execution");
-		brsstrcat( request.uri, "?action=stop&json=1");	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/rapid/execution");
+				brsstrcat( request.uri, "?action=stop&json=1");	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/rapid/execution/stop");
+				break;
+		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
@@ -206,8 +230,15 @@ void A3brControl(struct A3brControl* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST; 
-		brsstrcpy( request.uri, "/rw/rapid/execution");
-		brsstrcat( request.uri, "?action=resetpp&json=1");	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/rapid/execution");
+				brsstrcat( request.uri, "?action=resetpp&json=1");	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/rapid/execution/resetpp?mastership=implicit");	
+				break;
+		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
