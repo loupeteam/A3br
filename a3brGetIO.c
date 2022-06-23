@@ -38,7 +38,7 @@ signed short A3brGetIOParse(struct A3brGetIO *data, jsmn_callback_data *data2) {
 }
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brGetIOErrorCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brGetIOErrorCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -49,7 +49,7 @@ void A3brGetIOErrorCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, 
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brGetIOSuccessCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brGetIOSuccessCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	
 	// Declare the data, tokens, and parser
 	jsmn_parser parser;

@@ -26,4 +26,5 @@ void getDigestParameters( const unsigned char *buf, unsigned char *realm, unsign
 unsigned long getCookie( const unsigned char *buf, unsigned char *httpSession, unsigned char *abbcx);
 void MD5Test(unsigned char *digest);
 unsigned long generateDigestAuthorization( A3brDigestAuthentication_typ *auth, const char *uri , unsigned char * authHeader);
+unsigned long generateBasicAuthorization( A3brDigestAuthentication_typ *auth, unsigned char * authHeader);
 

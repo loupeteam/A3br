@@ -21,6 +21,8 @@
 #endif
 
 #include "md5.h"
+#include "A3br.h"
+#include "base64.h"
 
 #pragma GCC diagnostic ignored "-Wint-conversion"
 #pragma GCC diagnostic ignored "-Wpointer-sign"
@@ -265,6 +267,26 @@ unsigned long generateDigestAuthorization( A3brDigestAuthentication_typ *auth, c
 	brsstrcat(authHeader,", cnonce=\"");
 	brsstrcat(authHeader,auth->cnonce);
 	brsstrcat(authHeader,"\"");
+	
+	return 0;
+	
+}
+
+unsigned long generateBasicAuthorization( A3brDigestAuthentication_typ *auth, unsigned char * authHeader){
+	
+	unsigned char credentials[200];
+	brsstrcpy(credentials, auth->userName);
+	brsstrcat(credentials, ":");
+	brsstrcat(credentials, auth->password);
+	
+	// Encode the credentials using base64. 
+	unsigned char base64Credentials[200];
+	memset(base64Credentials, 0, sizeof(base64Credentials));
+	Base64encode(base64Credentials, credentials, strlen(credentials));
+	
+	// Create authorization header
+	brsstrcpy(authHeader, "Basic ");
+	brsstrcat(authHeader, base64Credentials);
 	
 	return 0;
 	

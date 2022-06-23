@@ -13,6 +13,7 @@ extern "C" {
 #include "A3br.h"
 #include "digest.h"
 #include "A3brCommon.h"
+
 #ifdef __cplusplus
 };
 #endif
@@ -26,7 +27,6 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 
 void A3brWebService(struct A3brWebService *inst)
 {
-
 	int MAX_HTTP_CONNECTIONS = inst->configuration.maxSessions ? inst->configuration.maxSessions : 1;
 	MAX_HTTP_CONNECTIONS = MAX_HTTP_CONNECTIONS > 3 ? 3 : MAX_HTTP_CONNECTIONS;
 	int i = 0;
@@ -41,6 +41,7 @@ void A3brWebService(struct A3brWebService *inst)
 		if (!inst->internal.api.requestBuffer.Data)
 		{
 			BufferInit(&inst->internal.api.requestBuffer, 200, sizeof(A3brWebServiceRequest_typ));
+			inst->internal.api.apiVersion = inst->configuration.apiVersion;
 		}
 		for (i = 0; i < MAX_HTTP_CONNECTIONS; i++)
 		{
@@ -85,6 +86,9 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 	{
 		
 		brsstrcpy(inst->connection[i].httpClient.hostname, configuration->hostname);
+		if (configuration->apiVersion == A3BR_API_VERSION_2) {
+			inst->connection[i].httpClient.https = 1;
+		}
 		inst->connection[i].httpClient.port = configuration->port;
 		
 		if (inst->connection[i].httpClient.connected) {
@@ -135,6 +139,9 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 			brsmemset(inst->connection[i].reqHeader, 0, sizeof(inst->connection[i].reqHeader));
 			addHeaderLine(&inst->connection[i].reqHeader, "connection", "keep-alive");
 			addHeaderLine(&inst->connection[i].reqHeader, "keep-alive", "timeout=60");
+			if (configuration->apiVersion == A3BR_API_VERSION_2) {
+				addHeaderLine(&inst->connection[i].reqHeader, "accept", "application/hal+json;v=2.0");
+			}
 
 			if (inst->connection[i].currentRequest.dataType == A3BR_REQ_DATA_TYPE_PARS)
 			{
@@ -213,7 +220,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 								if (inst->connection[i].currentRequest.errorCallback)
 								{
 									pCallback = (A3brCallback)inst->connection[i].currentRequest.errorCallback;
-									pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData);
+									pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData, configuration->apiVersion);
 								}
 							}
 							else
@@ -231,7 +238,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 						if (inst->connection[i].currentRequest.successCallback)
 						{
 							pCallback = (A3brCallback)inst->connection[i].currentRequest.successCallback;
-							pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData);
+							pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData, configuration->apiVersion);
 						}
 						break;
 					case 503:
@@ -247,7 +254,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 						if (inst->connection[i].currentRequest.errorCallback)
 						{
 							pCallback = (A3brCallback)inst->connection[i].currentRequest.errorCallback;
-							pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData);
+							pCallback(inst->connection[i].currentRequest.self, &inst->connection[i].httpRequest.header, &inst->connection[i].resData, configuration->apiVersion);
 						}
 						break;
 				}
@@ -270,24 +277,26 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 
 			//Send a connection packet to check the authentication state.
 			case A3BR_AUTH_ST_INIT:
-				
-				brsmemset(&inst->auth, 0, sizeof(inst->auth));
-				brsstrcpy(inst->auth.userName, configuration->username);
-				brsstrcpy(inst->auth.password, configuration->password);
-				brsstrcpy(inst->auth.cnonce, "0a4f113b");
-				brsstrcpy(inst->authRequest.uri, "/?json=1");
-				
-				//Use separate data for the auth so as to not overwrite a valid request.. We should get back to it once auth is ok
-				brsstrcpy(inst->connection[i].httpRequest.uri, inst->authRequest.uri);
-				
-				inst->connection[i].httpRequest.method = LLHTTP_METHOD_GET;	
-				
-				//Clear out the header
-				brsmemset(inst->connection[i].reqHeader, 0, sizeof(inst->connection[i].reqHeader));
-				inst->connection[i].httpRequest.numUserHeaders = 0;
-	
-				connection->httpRequest.send = 1;
-				inst->authState = A3BR_AUTH_ST_WAIT_FOR_SERVER;
+				// Wait for the client block to be connected.
+				if (connection->httpRequest.ident != 0) {				
+					brsmemset(&inst->auth, 0, sizeof(inst->auth));
+					brsstrcpy(inst->auth.userName, configuration->username);
+					brsstrcpy(inst->auth.password, configuration->password);
+					brsstrcpy(inst->auth.cnonce, "0a4f113b");
+					brsstrcpy(inst->authRequest.uri, "/?json=1");
+					
+					//Use separate data for the auth so as to not overwrite a valid request.. We should get back to it once auth is ok
+					brsstrcpy(inst->connection[i].httpRequest.uri, inst->authRequest.uri);
+					
+					inst->connection[i].httpRequest.method = LLHTTP_METHOD_GET;	
+					
+					//Clear out the header
+					brsmemset(inst->connection[i].reqHeader, 0, sizeof(inst->connection[i].reqHeader));
+					inst->connection[i].httpRequest.numUserHeaders = 0;
+		
+					connection->httpRequest.send = 1;
+					inst->authState = A3BR_AUTH_ST_WAIT_FOR_SERVER;
+				}
 				break;
 
 			//Wait for the server to respond to the connection packet.
@@ -333,38 +342,47 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 
 				if (connection->httpRequest.send && inst->connection[i].retries == 0)
 				{
+					//If we have cookies, use them
+					if (brsstrlen(inst->auth.httpSession) > 0)
+					{					
+						STRING headerValue[LLHTTP_MAX_LEN_HEADER_VALUE];
+						//	brsstrcpy(inst->connection[i].reqHeader[0].name, "Cookie");
+						brsstrcpy(headerValue, "-http-session-=");
+						brsstrcat(headerValue, inst->auth.httpSession);
+						brsstrcat(headerValue, ";");
 						//If we have cookies, use them
-						if (brsstrlen(inst->auth.httpSession) > 0)
-						{					
-							STRING headerValue[LLHTTP_MAX_LEN_HEADER_VALUE];
-							//	brsstrcpy(inst->connection[i].reqHeader[0].name, "Cookie");
-							brsstrcpy(headerValue, "-http-session-=");
-							brsstrcat(headerValue, inst->auth.httpSession);
-							brsstrcat(headerValue, ";");
-							//If we have cookies, use them
-							if (brsstrlen(inst->auth.ABBCX) > 0)
-							{
-								brsstrcat(headerValue, "ABBCX=");
-								brsstrcat(headerValue, inst->auth.ABBCX);
-								brsstrcat(headerValue, ";");
-							}
-							addHeaderLine(&inst->connection[i].reqHeader, "Cookie", headerValue);
-							inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
-						}
-							//Do the authorization
-						else if (brsstrcmp(inst->auth.qop, "auth") == 0)
+						if (brsstrlen(inst->auth.ABBCX) > 0)
 						{
-							STRING nc[8];
-							brsitoa(++inst->auth.count, nc);
-							brsmemset(inst->auth.nc, 0, sizeof(inst->auth.nc));
-							brsmemset(inst->auth.nc, '0', sizeof(inst->auth.nc) - 1);
-							brsmemcpy(inst->auth.nc + sizeof(inst->auth.nc) - brsstrlen(nc) - 1, &nc, brsstrlen(nc));
+							brsstrcat(headerValue, "ABBCX=");
+							brsstrcat(headerValue, inst->auth.ABBCX);
+							brsstrcat(headerValue, ";");
+						}
+						addHeaderLine(&inst->connection[i].reqHeader, "Cookie", headerValue);
+						inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
+					}
+					//Do the authorization for V1.0 API (digest auth). 
+					else if ((configuration->apiVersion == A3BR_API_VERSION_1) && (brsstrcmp(inst->auth.qop, "auth") == 0))
+					{
+						STRING nc[8];
+						brsitoa(++inst->auth.count, nc);
+						brsmemset(inst->auth.nc, 0, sizeof(inst->auth.nc));
+						brsmemset(inst->auth.nc, '0', sizeof(inst->auth.nc) - 1);
+						brsmemcpy(inst->auth.nc + sizeof(inst->auth.nc) - brsstrlen(nc) - 1, &nc, brsstrlen(nc));
 
-							digestAuth(inst->auth.userName, inst->auth.realm, inst->auth.password, connection->httpRequest.method, connection->httpRequest.uri, inst->auth.nonce, inst->auth.nc, inst->auth.cnonce, inst->auth.qop, inst->auth.digest);
-							STRING authHeader[3000];
-							generateDigestAuthorization(&inst->auth, connection->httpRequest.uri, authHeader);
-							addHeaderLine(&inst->connection[i].reqHeader, "Authorization", authHeader);
-							inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
+						digestAuth(inst->auth.userName, inst->auth.realm, inst->auth.password, connection->httpRequest.method, connection->httpRequest.uri, inst->auth.nonce, inst->auth.nc, inst->auth.cnonce, inst->auth.qop, inst->auth.digest);
+						STRING authHeader[3000];
+						generateDigestAuthorization(&inst->auth, connection->httpRequest.uri, authHeader);
+						addHeaderLine(&inst->connection[i].reqHeader, "Authorization", authHeader);
+						inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
+					}
+					//Do the authorization for V2.0 API (basic auth).
+					else if (configuration->apiVersion == A3BR_API_VERSION_2)
+					{
+						STRING authHeader[3000];
+						generateBasicAuthorization(&inst->auth, authHeader);
+						addHeaderLine(&inst->connection[i].reqHeader, "Authorization", authHeader);
+						addHeaderLine(&inst->connection[i].reqHeader, "accept", "application/hal+json;v=2.0");
+						inst->connection[i].httpRequest.numUserHeaders = getNumHeaders(&inst->connection[i].reqHeader);
 					}
 				}
 				break;
@@ -406,8 +424,11 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 					//Get the authentication parameters.
 					brsmemset(inst->auth.httpSession, 0, sizeof(inst->auth.httpSession));
 					brsmemset(inst->auth.ABBCX, 0, sizeof(inst->auth.ABBCX));
-					int headerIndex = LLHttpgetHeaderIndex(&connection->httpRequest.header.lines, "www-authenticate", 0);
-					getDigestParameters(&connection->httpRequest.header.lines[headerIndex].value, inst->auth.realm, inst->auth.qop, inst->auth.nonce, inst->auth.opaque);
+					//Only need to perform digest auth for v1.0; v2.0 uses basic auth instead since it's encrypted. 
+					if (configuration->apiVersion == A3BR_API_VERSION_1) {
+						int headerIndex = LLHttpgetHeaderIndex(&connection->httpRequest.header.lines, "www-authenticate", 0);
+						getDigestParameters(&connection->httpRequest.header.lines[headerIndex].value, inst->auth.realm, inst->auth.qop, inst->auth.nonce, inst->auth.opaque);
+					}
 					inst->authState = A3BR_AUTH_ST_AUTHENTICATE;
 					break;
 				case 503:

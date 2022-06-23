@@ -13,4 +13,4 @@
 	};
 #endif
 
-typedef void (* A3brCallback)( UDINT, LLHttpHeader_typ * header, unsigned char * data);
+typedef void (* A3brCallback)( UDINT, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion);

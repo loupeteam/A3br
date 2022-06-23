@@ -22,6 +22,8 @@
     <File>md5.c</File>
     <File>digest.h</File>
     <File>digest.c</File>
+	<File>base64.h</File>
+	<File>base64.c</File>
   </Files>
   <Dependencies>
     <Dependency ObjectName="AsHttp" />

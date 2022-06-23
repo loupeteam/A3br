@@ -23,7 +23,7 @@
 //#pragma GCC diagnostic ignored "-Wreturn-type"
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brControlErrorCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brControlErrorCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -34,7 +34,7 @@ void A3brControlErrorCallback( struct A3brControl* inst, LLHttpHeader_typ * head
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brControlSuccessCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brControlSuccessCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	
 	inst->internal.error = 0;
 	inst->internal.done = 1;
