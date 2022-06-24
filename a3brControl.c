@@ -266,9 +266,16 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 		
 		//Create a folder to hold the new program files.	
-		request.method = LLHTTP_METHOD_POST; 						
-		brsstrcpy( request.uri, "/rw/mastership" );
-		brsstrcat( request.uri, "?action=request" );	
+		request.method = LLHTTP_METHOD_POST; 	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/mastership" );
+				brsstrcat( request.uri, "?action=request" );
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/mastership/request" );
+				break;
+		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		brsmemset(&request.parameters, 0, sizeof(request.parameters));
 		BufferAddToBottom( &connection->requestBuffer, &request );			
@@ -293,9 +300,16 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 		
 		//Create a folder to hold the new program files.	
-		request.method = LLHTTP_METHOD_POST; 						
-		brsstrcpy( request.uri, "/rw/mastership" );
-		brsstrcat( request.uri, "?action=release&json=1" );	
+		request.method = LLHTTP_METHOD_POST; 
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/mastership" );
+				brsstrcat( request.uri, "?action=release&json=1" );	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/mastership/release" );
+				break;
+		}		
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		brsmemset(&request.parameters, 0, sizeof(request.parameters));
 		BufferAddToBottom( &connection->requestBuffer, &request );			
