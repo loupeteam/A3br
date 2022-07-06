@@ -1,5 +1,6 @@
 library "jenkinsLibrary@feature/libraryBuilder"
 
 buildPublishPipeline(
-   slackChannel: 'lpm-bots'
+   slackChannel: 'lpm-bots',
+   lpmVersion: 'develop'
 )
