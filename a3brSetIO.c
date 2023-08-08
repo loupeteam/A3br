@@ -75,9 +75,18 @@ void A3brSetIO(struct A3brSetIO* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST; 
-		brsstrcpy( request.uri, "/rw/iosystem/signals/" );
-		brsstrcat( request.uri, inst->pSignal );
-		brsstrcat( request.uri, "?action=set&json=1" );	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/iosystem/signals/" );
+				brsstrcat( request.uri, inst->pSignal );
+				brsstrcat( request.uri, "?action=set&json=1" );	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/iosystem/signals/" );
+				brsstrcat( request.uri, inst->pSignal );
+				brsstrcat( request.uri, "/set-value?json=1" );	
+				break;
+		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		brsstrcpy( request.parameters[0].name, "lvalue" );
 		STRING lvalue[10];
