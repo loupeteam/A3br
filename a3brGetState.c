@@ -28,7 +28,7 @@
 // opmode: The operation mode {INIT | AUTO_CH | MANF_CH | MANR | MANF | AUTO | UNDEF}
 
 // Callback function used to stored JSON string data in user defined data structure.
-signed short A3brGetRapidParse(struct A3brGetState *data, jsmn_callback_data *data2) {
+signed short A3brGetRapidParseApiVersion1(struct A3brGetState *data, jsmn_callback_data *data2) {
 	if(data2->Levels == 4) {
 		// Identify the correct structure to use based on the active request.  
 		if(!brsstrcmp(&data2->Structure[3], &"_embedded")) {
@@ -116,6 +116,94 @@ signed short A3brGetRapidParse(struct A3brGetState *data, jsmn_callback_data *da
 	return 0;
 }
 
+signed short A3brGetRapidParseApiVersion2(struct A3brGetState *data, jsmn_callback_data *data2) {
+	if(data2->Levels == 3) {
+		// Identify the correct structure to use based on the active request.  
+		//if(!brsstrcmp(&data2->Structure[3], &"_embedded")) {
+			if(!brsstrcmp(&data2->Structure[2], &"state")) {
+				if(!brsstrcmp(&data2->Structure[1], &"opmode")) {
+					if(!brsstrcmp(&data2->Structure[0], &"INIT")) {
+						data->operationalMode = A3BR_OP_MODE_INIT;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"AUTO_CH")) {
+						data->operationalMode = A3BR_OP_MODE_AUTO_CHANGE_REQ;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"MANF_CH")) {
+						data->operationalMode = A3BR_OP_MODE_MANUAL_CHANGE_REQ;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"MANR")) {
+						data->operationalMode = A3BR_OP_MODE_MANUAL_LOW_SPEED;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"MANF")) {
+						data->operationalMode = A3BR_OP_MODE_MANUAL_FULL_SPEED;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"AUTO")) {
+						data->operationalMode = A3BR_OP_MODE_AUTO;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"UNDEF")) {
+						data->operationalMode = A3BR_OP_MODE_UNDEFINED;
+					}				
+				}
+				else if(!brsstrcmp(&data2->Structure[1], &"ctrlstate")) {
+					if(!brsstrcmp(&data2->Structure[0], &"init")) {
+						data->controlState = A3BR_CTRL_ST_INIT;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"motoron")) {
+						data->controlState = A3BR_CTRL_ST_ON;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"motoroff")) {
+						data->controlState = A3BR_CTRL_ST_OFF;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"guardstop")) {
+						data->controlState = A3BR_CTRL_ST_GUARDSTOP;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"emergencystop")) {
+						data->controlState = A3BR_CTRL_ST_ESTOP;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"emergencystopreset")) {
+						data->controlState = A3BR_CTRL_ST_ESTOP_RESET;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"sysfail")) {
+						data->controlState = A3BR_CTRL_ST_SYS_FAIL;
+					}
+					else {
+						data->controlState = A3BR_CTRL_ST_UNDEFINED;
+					}
+				}				
+				else if(!brsstrcmp(&data2->Structure[1], &"ctrlexecstate")) {
+					if(!brsstrcmp(&data2->Structure[0], &"running")) {
+						data->rapidExecutionState = A3BR_RAPID_EXEC_ST_RUNNING;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"stopped")) {
+						data->rapidExecutionState = A3BR_RAPID_EXEC_ST_STOPPED;
+					}
+					else {
+						data->rapidExecutionState = A3BR_RAPID_EXEC_ST_UNDEFINED;
+					}
+				}				
+				else if(!brsstrcmp(&data2->Structure[1], &"cycle")) {
+					if(!brsstrcmp(&data2->Structure[0], &"forever")) {
+						data->rapidCycleState = A3BR_RAPID_CYCLE_ST_FOREVER;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"asis")) {
+						data->rapidCycleState = A3BR_RAPID_CYCLE_ST_ASIS;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"once")) {
+						data->rapidCycleState = A3BR_RAPID_CYCLE_ST_ONCE;
+					}
+					else if(!brsstrcmp(&data2->Structure[0], &"oncedone")) {
+						data->rapidCycleState = A3BR_RAPID_CYCLE_ST_ONCEDONE;
+					}
+					else {
+						data->rapidCycleState = A3BR_RAPID_CYCLE_ST_UNDEFINED;
+					}
+				}								
+			}
+		//}
+	}
+	return 0;
+}
+
 //This gets called by A3brWebService if the HTTP request fails in any way.
 void A3brGetStateErrorCallback( struct A3brGetState* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	inst->internal.error = 1;
@@ -141,7 +229,14 @@ void A3brGetStateSuccessCallback( struct A3brGetState* inst, LLHttpHeader_typ * 
 	JsmnInit(&parser);
 
 	// Assign user defined callback function & data
-	parser.callback.pFunction= (UDINT)A3brGetRapidParse;
+	switch(apiVersion) {
+		case A3BR_API_VERSION_1:
+			parser.callback.pFunction= (UDINT)A3brGetRapidParseApiVersion1;
+			break;
+		case A3BR_API_VERSION_2:
+			parser.callback.pFunction= (UDINT)A3brGetRapidParseApiVersion2;
+			break;
+	}
 	parser.callback.pUserData = (UDINT)inst;
 	
 	// Parse message
@@ -164,7 +259,14 @@ void A3brGetStateFinalSuccessCallback( struct A3brGetState* inst, LLHttpHeader_t
 	JsmnInit(&parser);
 
 	// Assign user defined callback function & data
-	parser.callback.pFunction= (UDINT)A3brGetRapidParse;
+	switch(apiVersion) {
+		case A3BR_API_VERSION_1:
+			parser.callback.pFunction= (UDINT)A3brGetRapidParseApiVersion1;
+			break;
+		case A3BR_API_VERSION_2:
+			parser.callback.pFunction= (UDINT)A3brGetRapidParseApiVersion2;
+			break;
+	}
 	parser.callback.pUserData = (UDINT)inst;
 	
 	// Parse message
@@ -230,9 +332,16 @@ void A3brGetState(struct A3brGetState* inst){
 		BufferAddToBottom( &connection->requestBuffer, &request);
 
 		//Create and populate second new request.
-		brsstrcpy( request.uri, "/rw/panel/ctrlstate");
-		brsstrcat( request.uri, "?json=1");
-				
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/panel/ctrlstate");
+				brsstrcat( request.uri, "?json=1");
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/panel/ctrl-state");
+				brsstrcat( request.uri, "?json=1");
+				break;
+		}		
 		//Pass second request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request);
 
