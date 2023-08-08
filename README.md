@@ -5,6 +5,11 @@ info@loupe.team
 1-800-240-7042
 
 # Change log
+
+- 0.4.0:
+	- Add initial support for RWS2.0 (i.e. the version that ships with Omnicore robots)
+	- NOTE that the only supported blocks with 2.0 currently are GetIO, SetIO, GetSymbol, SetSymbol, and GetState.
+
 - 0.3.5:
     - Fix bug that would append auth or cookies many times on connection loss
 
