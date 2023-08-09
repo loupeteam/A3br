@@ -36,7 +36,7 @@
 //userlog : Log changes on controller {true | false), set if the setting shall be logged as Event log. Default value is 'false'
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brSetIOErrorCallback( struct A3brSetIO* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brSetIOErrorCallback( struct A3brSetIO* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -47,7 +47,7 @@ void A3brSetIOErrorCallback( struct A3brSetIO* inst, LLHttpHeader_typ * header, 
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brSetIOSuccessCallback( struct A3brSetIO* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brSetIOSuccessCallback( struct A3brSetIO* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	inst->internal.error = 0;
 	inst->internal.done = 1;
 	inst->internal.busy = 0;
@@ -75,9 +75,18 @@ void A3brSetIO(struct A3brSetIO* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST; 
-		brsstrcpy( request.uri, "/rw/iosystem/signals/" );
-		brsstrcat( request.uri, inst->pSignal );
-		brsstrcat( request.uri, "?action=set&json=1" );	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/iosystem/signals/" );
+				brsstrcat( request.uri, inst->pSignal );
+				brsstrcat( request.uri, "?action=set&json=1" );	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/iosystem/signals/" );
+				brsstrcat( request.uri, inst->pSignal );
+				brsstrcat( request.uri, "/set-value?json=1" );	
+				break;
+		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		brsstrcpy( request.parameters[0].name, "lvalue" );
 		STRING lvalue[10];

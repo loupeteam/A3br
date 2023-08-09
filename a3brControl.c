@@ -23,7 +23,7 @@
 //#pragma GCC diagnostic ignored "-Wreturn-type"
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brControlErrorCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brControlErrorCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -34,7 +34,7 @@ void A3brControlErrorCallback( struct A3brControl* inst, LLHttpHeader_typ * head
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brControlSuccessCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brControlSuccessCallback( struct A3brControl* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	
 	inst->internal.error = 0;
 	inst->internal.done = 1;
@@ -65,11 +65,22 @@ void A3brControl(struct A3brControl* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST; 
-		brsstrcpy( request.uri, "rw/panel/ctrlstate" );
-		brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
-		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
-		brsstrcpy( request.parameters[0].name, "ctrl-state" );
-		brsstrcpy( request.parameters[0].value, "motoron" );
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "rw/panel/ctrlstate" );
+				brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsstrcpy( request.parameters[0].name, "ctrl-state" );
+				brsstrcpy( request.parameters[0].value, "motoron" );
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "rw/panel/ctrlstate" );
+				brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsstrcpy( request.parameters[0].name, "ctrl-state" );
+				brsstrcpy( request.parameters[0].value, "motoron" );
+				break;
+		}
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
 
@@ -131,9 +142,15 @@ void A3brControl(struct A3brControl* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST;
-		brsstrcpy( request.uri, "/rw/rapid/execution" );
-		brsstrcat( request.uri, "?action=start&json=1" );
-		
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/rapid/execution" );
+				brsstrcat( request.uri, "?action=start&json=1" );
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/rapid/execution/start?mastership=implicit" );
+				break;
+		}		
 		//Pass in all required parameters for the start command.
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		request.errorCallback = &A3brControlErrorCallback;
@@ -179,8 +196,15 @@ void A3brControl(struct A3brControl* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST;
-		brsstrcpy( request.uri, "/rw/rapid/execution");
-		brsstrcat( request.uri, "?action=stop&json=1");	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/rapid/execution");
+				brsstrcat( request.uri, "?action=stop&json=1");	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/rapid/execution/stop?mastership=implicit");
+				break;
+		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
@@ -206,8 +230,15 @@ void A3brControl(struct A3brControl* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST; 
-		brsstrcpy( request.uri, "/rw/rapid/execution");
-		brsstrcat( request.uri, "?action=resetpp&json=1");	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/rapid/execution");
+				brsstrcat( request.uri, "?action=resetpp&json=1");	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/rapid/execution/resetpp?mastership=implicit");	
+				break;
+		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
@@ -235,9 +266,16 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 		
 		//Create a folder to hold the new program files.	
-		request.method = LLHTTP_METHOD_POST; 						
-		brsstrcpy( request.uri, "/rw/mastership" );
-		brsstrcat( request.uri, "?action=request" );	
+		request.method = LLHTTP_METHOD_POST; 	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/mastership" );
+				brsstrcat( request.uri, "?action=request" );
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/mastership/request" );
+				break;
+		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		brsmemset(&request.parameters, 0, sizeof(request.parameters));
 		BufferAddToBottom( &connection->requestBuffer, &request );			
@@ -262,9 +300,16 @@ void A3brControl(struct A3brControl* inst){
 		request.successCallback = &A3brControlSuccessCallback;
 		
 		//Create a folder to hold the new program files.	
-		request.method = LLHTTP_METHOD_POST; 						
-		brsstrcpy( request.uri, "/rw/mastership" );
-		brsstrcat( request.uri, "?action=release&json=1" );	
+		request.method = LLHTTP_METHOD_POST; 
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/mastership" );
+				brsstrcat( request.uri, "?action=release&json=1" );	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/mastership/release" );
+				break;
+		}		
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		brsmemset(&request.parameters, 0, sizeof(request.parameters));
 		BufferAddToBottom( &connection->requestBuffer, &request );			

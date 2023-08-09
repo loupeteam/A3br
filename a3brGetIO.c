@@ -23,7 +23,7 @@
 //#pragma GCC diagnostic ignored "-Wreturn-type"
 
 // Callback function used to store JSON string data in user defined data structure.
-signed short A3brGetIOParse(struct A3brGetIO *data, jsmn_callback_data *data2) {
+signed short A3brGetIOParseApiVersion1(struct A3brGetIO *data, jsmn_callback_data *data2) {
 	if(data2->Levels == 4) {
 		// Identify the correct structure to use based on the active request.  
 		if(!brsstrcmp(&data2->Structure[3], &"_embedded")) {
@@ -37,8 +37,22 @@ signed short A3brGetIOParse(struct A3brGetIO *data, jsmn_callback_data *data2) {
 	return 0;
 }
 
+signed short A3brGetIOParseApiVersion2(struct A3brGetIO *data, jsmn_callback_data *data2) {
+	if(data2->Levels == 4) {
+		// Identify the correct structure to use based on the active request.  
+		if(!brsstrcmp(&data2->Structure[3], &"_embedded")) {
+			if(!brsstrcmp(&data2->Structure[2], &"resources")) {
+				if(!brsstrcmp(&data2->Structure[1], &"lvalue")) {
+					data->value = brsatoi(data2->Value);
+				}
+			}
+		}
+	}
+	return 0;
+}
+
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brGetIOErrorCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brGetIOErrorCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	inst->internal.error = 1;
 	inst->internal.done = 0;
 	inst->internal.busy = 0;
@@ -49,7 +63,7 @@ void A3brGetIOErrorCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, 
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brGetIOSuccessCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brGetIOSuccessCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	
 	// Declare the data, tokens, and parser
 	jsmn_parser parser;
@@ -62,7 +76,14 @@ void A3brGetIOSuccessCallback( struct A3brGetIO* inst, LLHttpHeader_typ * header
 	JsmnInit(&parser);
 
 	// Assign user defined callback function & data
-	parser.callback.pFunction= (UDINT)A3brGetIOParse;
+	switch(apiVersion) {
+		case A3BR_API_VERSION_1:
+			parser.callback.pFunction= (UDINT)A3brGetIOParseApiVersion1;
+			break;
+		case A3BR_API_VERSION_2:
+			parser.callback.pFunction= (UDINT)A3brGetIOParseApiVersion2;
+			break;
+	}
 	parser.callback.pUserData = (UDINT)inst;
 		
 	// Parse message

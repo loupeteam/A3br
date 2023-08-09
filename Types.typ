@@ -25,6 +25,7 @@ TYPE
 		username : STRING[80];
 		password : STRING[80];
 		maxSessions : USINT;
+		apiVersion : A3BR_API_VERSION_enum;
 	END_STRUCT;
 	A3brWebServiceRequest_typ : 	STRUCT 
 		self : UDINT;
@@ -84,6 +85,7 @@ TYPE
 	END_STRUCT;
 	A3brWebServiceLink_typ : 	STRUCT 
 		requestBuffer : Buffer_typ;
+		apiVersion : A3BR_API_VERSION_enum;
 	END_STRUCT;
 	A3brProgramControlInternal_typ : 	STRUCT 
 		done : BOOL;
@@ -189,6 +191,11 @@ TYPE
 		A3BR_VAR_TYPE_INT,
 		A3BR_VAR_TYPE_REAL,
 		A3BR_VAR_TYPE_STRING
+		);
+	A3BR_API_VERSION_enum : 
+		(
+		A3BR_API_VERSION_1,
+		A3BR_API_VERSION_2
 		);
 END_TYPE
 

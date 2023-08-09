@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <?AutomationStudio FileVersion="4.9"?>
-<Library Version="0.03.5" SubType="ANSIC" xmlns="http://br-automation.co.at/AS/Library">
+<Library Version="0.04.0" SubType="ANSIC" xmlns="http://br-automation.co.at/AS/Library">
   <Files>
     <File>LICENSE.md</File>
     <File>README.md</File>
@@ -22,15 +22,17 @@
     <File>md5.c</File>
     <File>digest.h</File>
     <File>digest.c</File>
+    <File>base64.h</File>
+    <File>base64.c</File>
   </Files>
   <Dependencies>
     <Dependency ObjectName="AsHttp" />
-    <Dependency ObjectName="jsmn_parse" FromVersion="1.03.0" ToVersion="1.04.9" />
+    <Dependency ObjectName="jsmn_parse" FromVersion="1.03.0" ToVersion="1.05.9" />
     <Dependency ObjectName="RingBufLib" FromVersion="0.02.4" ToVersion="0.02.9" />
     <Dependency ObjectName="standard" />
     <Dependency ObjectName="StringExt" FromVersion="0.12.1" ToVersion="0.14.9" />
     <Dependency ObjectName="sys_lib" />
-    <Dependency ObjectName="LLHttp" />
+    <Dependency ObjectName="LLHttp" FromVersion="0.01.2" ToVersion="0.01.9" />
     <Dependency ObjectName="AsBrStr" />
   </Dependencies>
 </Library>

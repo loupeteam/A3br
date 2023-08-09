@@ -39,7 +39,7 @@ signed short A3brParseIOParse(struct A3brIOWatchIOInternal_typ *data, jsmn_callb
 }
 
 //This gets called by A3brWebService if the HTTP request fails in any way.
-void A3brIOWatchErrorCallback( struct A3brIOWatchIOInternal_typ* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brIOWatchErrorCallback( struct A3brIOWatchIOInternal_typ* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	inst->error= 1;
 	inst->busy= 0;
 	inst->errorID = A3BR_ERR_HTTP_ERROR;
@@ -49,7 +49,7 @@ void A3brIOWatchErrorCallback( struct A3brIOWatchIOInternal_typ* inst, LLHttpHea
 }
 
 //This gets called by A3brWebService once the HTTP request has completed successfully. 
-void A3brIOWatchSuccessCallback( struct A3brIOWatchIOInternal_typ* inst, LLHttpHeader_typ * header, unsigned char * data){
+void A3brIOWatchSuccessCallback( struct A3brIOWatchIOInternal_typ* inst, LLHttpHeader_typ * header, unsigned char * data, A3BR_API_VERSION_enum apiVersion){
 	
 	inst->error= 0;
 	inst->busy= 0;
