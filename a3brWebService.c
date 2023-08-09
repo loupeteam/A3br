@@ -38,10 +38,10 @@ void A3brWebService(struct A3brWebService *inst)
 
 	if (inst->enable)
 	{
+		inst->internal.api.apiVersion = inst->configuration.apiVersion;
 		if (!inst->internal.api.requestBuffer.Data)
 		{
 			BufferInit(&inst->internal.api.requestBuffer, 200, sizeof(A3brWebServiceRequest_typ));
-			inst->internal.api.apiVersion = inst->configuration.apiVersion;
 		}
 		for (i = 0; i < MAX_HTTP_CONNECTIONS; i++)
 		{
