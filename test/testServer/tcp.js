@@ -1,3 +1,12 @@
+/*
+ * File: tcp.js
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of A3BR, licensed under the MIT License.
+ * 
+ */
+
 var net = require('net');
 
 var server = net.createServer();
