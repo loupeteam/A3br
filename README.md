@@ -26,4 +26,5 @@ For more information about LPM, see https://loupeteam.github.io/LoupeDocs/tools/
 This project is primarily licensed under the [MIT License](LICENSE.md). However, it includes components under the [Apple Public Source License (APSL)](LICENSE-APSL.md) and the [Apache Group License](LICENSE-Apache.md). Please refer to the respective files for full license texts.
 
 base64.c : [Apple Public Source License (APSL)](LICENSE-APSL.md) AND [Apache Group License](LICENSE-Apache.md)
+
 base64.h : [Apple Public Source License (APSL)](LICENSE-APSL.md) AND [Apache Group License](LICENSE-Apache.md)
