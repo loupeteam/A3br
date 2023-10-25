@@ -1,74 +1,29 @@
 # Info
-Library is provided by Loupe
-https://loupe.team
-info@loupe.team
-1-800-240-7042
+Library is provided by Loupe  
+https://loupe.team  
+info@loupe.team  
+1-800-240-7042  
 
-# Change log
+# Description
+ABB provides a REST API for interfacing with its robots, called Robot Web Services. This library implements an HTTP client to handle communication between a B&R PLC and an ABB IRC’s Robot Web Services server. It thereby provides read and write access to a wide range of settings and parameters on the IRC, as ABB has exposed most of its inner workings via this API. 
 
-- 0.4.0:
-	- Add initial support for RWS2.0 (i.e. the version that ships with Omnicore robots)
-	- NOTE that the only supported blocks with 2.0 currently are GetIO, SetIO, GetSymbol, SetSymbol, and GetState.
+# Use Cases
+Many different types of process-level communication between the two systems are possible using this library:
 
-- 0.3.5:
-    - Fix bug that would append auth or cookies many times on connection loss
+-Retrieve the current state of the IRC (RAPID state, program execution state, etc)  
+-Read/write the value of an IO signal on the IRC  
+-Read/write the value of a data symbol (i.e. RAPID var) on the IRC  
+-Control program execution (start, stop, reset PP)  
 
-- 0.3.4:
-    - Fix 503 bug by closing the connection if detected
+For more documentation and examples, see https://loupeteam.github.io/LoupeDocs/libraries/a3br.html
 
-- 0.3.3-032921:
-    - Add status enum 2 string functions
-  
-- 0.3.2-032321:
-    - Reduce maximum of http connections to 1
-    - Workaround BUG with http status == 503
+# Installation
+To install using the Loupe Package Manager (LPM), in an initialized Automation Studio project directory run `lpm install a3br`. For more information about LPM, see https://loupeteam.github.io/LoupeDocs/tools/lpm.html
 
-- 0.3.1:
-    - Fix Start not returning done
-    - Fix some commands not report errors correctly  
+## Licensing
 
-- 0.3.0:
-	- Add support for maximum of 3 sessions
-	- Add support for maximum of 2 http connections per session
-	- Workaround BUG with http status == 200 and content-length == 0
+This project is primarily licensed under the [MIT License](LICENSE.md). However, it includes components under the [Apple Public Source License (APSL)](LICENSE-APSL.md) and the [Apache Group License](LICENSE-Apache.md). Please refer to the respective files for full license texts.
 
-- 0.2.1:
-	- Split power command into powerOn and powerOff
+base64.c : [Apple Public Source License (APSL)](LICENSE-APSL.md) AND [Apache Group License](LICENSE-Apache.md)
 
-- 0.2.0:
-	- Add in support for BOOL and REAL datatypes for symbol operations
-
-- 0.1.1:
-	- Revert HTTP protocol version to 0.1.1 to fix lost response error
-	- Fix JsmnParse argument bug (was passing in type instead of length)
-	- Fix behavior of done and busy bits for GetState block
-
-- 0.1.0:
-	- Add new SetSymbol and GetSymbol blocks
-	- Add ProgramControl block (this is experimental at this point)
-
-- 0.0.5:
-    - Update dependencies versions
-
-- 0.0.4:
-    - Update dependencies versions 
-
-- 0.0.3:
-	- Update FUB API to conform to style guide
-	- Expand error handling on all blocks
-	- Expand inline comments and add enums for clarity
- 
-- 0.0.2:
-    - Modify types to conform to style guide
-    - Fix some warnings
-		   
-- 0.0.1:
-    - First version
-
-# Documentation
-
-Documentation for this and other Loupe libraries can be found at https://loupeteam.github.io/Sandbox/libraries.html
-
-
-
-
+base64.h : [Apple Public Source License (APSL)](LICENSE-APSL.md) AND [Apache Group License](LICENSE-Apache.md)

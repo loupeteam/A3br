@@ -1,9 +1,11 @@
-//********************************************************************************
-// Author:    Josh Polansky
-// Created:   January 29, 2020
-// Description:
-//		Write a value to a data symbol signal on the IRC.
-//********************************************************************************
+/*
+ * File: A3brSetSymbol.c
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of A3BR, licensed under the MIT License.
+ * 
+ */
 
 #include <bur/plctypes.h>
 #ifdef __cplusplus

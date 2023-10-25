@@ -1,9 +1,11 @@
-//********************************************************************************
-// Author:    Josh Polansky
-// Created:   January 29, 2020
-// Description:
-//		Send high level commands to the IRC to control robot execution state.
-//********************************************************************************
+/*
+ * File: a3brControl.c 
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of A3BR, licensed under the MIT License.
+ * 
+ */
 
 #include <bur/plctypes.h>
 #ifdef __cplusplus

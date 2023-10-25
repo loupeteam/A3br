@@ -1,7 +1,11 @@
-//********************************************************************************
-// Author:    Josh Polansky
-// Created:   January 29, 2020
-//********************************************************************************
+/*
+ * File: digest.h
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of A3BR, licensed under the MIT License.
+ * 
+ */
 
 void digestFromHeader( const char *buf, 
 	const unsigned char * username, 

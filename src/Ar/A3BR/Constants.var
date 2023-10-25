@@ -1,0 +1,17 @@
+(*
+ * File: constats.var
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of A3BR, licensed under the MIT License.
+ * 
+ *)
+
+
+VAR CONSTANT
+	A3BR_MAI_REQUEST_PARS : UINT := 19;
+	A3BR_IO_STR_LEN : UINT := 80;
+	A3BR_SYMBOL_STR_LEN : UINT := 80;
+	A3BR_STR_ROWS4 : UINT := 19; (*	*)
+	A3BR_STR_ROWS20 : UINT := 19; (*	*)
+END_VAR
