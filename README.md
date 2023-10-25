@@ -82,10 +82,6 @@ For more information about LPM, see https://loupeteam.github.io/LoupeDocs/tools/
 - 0.0.1:
     - First version
 
-# Documentation
-
-Documentation for this and other Loupe libraries can be found at https://loupeteam.github.io/Sandbox/libraries.html
-
 
 
 
