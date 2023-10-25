@@ -1,9 +1,11 @@
-//********************************************************************************
-// Author:    Josh Polansky
-// Created:   January 29, 2020
-// Description:
-//		Set up cyclic read/write watch for a list of IO signals on the IRC. 
-//********************************************************************************
+/*
+ * File: a3brIOWatch.c
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of A3BR, licensed under the MIT License.
+ * 
+ */
 
 #include <bur/plctypes.h>
 #ifdef __cplusplus

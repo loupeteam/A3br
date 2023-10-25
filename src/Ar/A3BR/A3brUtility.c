@@ -1,9 +1,11 @@
-//********************************************************************************
-// Author:    Josh Polansky
-// Created:   January 29, 2020
-// Description:
-//		Read high level state information from the IRC.
-//********************************************************************************
+/*
+ * File: A3brUtility.c
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of A3BR, licensed under the MIT License.
+ * 
+ */
 
 #include <bur/plctypes.h>
 #ifdef __cplusplus

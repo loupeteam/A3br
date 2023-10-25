@@ -1,10 +1,11 @@
-//********************************************************************************
-// Author:    Josh Polansky
-// Created:   January 29, 2020
-// Description:
-//		Establish the initial connection to the IRC,
-//		and handle channeling of all HTTP traffic back and forth.
-//********************************************************************************
+/*
+ * File: a3brWebService.c
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of A3BR, licensed under the MIT License.
+ * 
+ */
 
 #include <bur/plctypes.h>
 #ifdef __cplusplus
