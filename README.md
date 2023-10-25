@@ -10,10 +10,10 @@ ABB provides a REST API for interfacing with its robots, called Robot Web Servic
 # Use Cases
 Many different types of process-level communication between the two systems are possible using this library:
 
--Retrieve the current state of the IRC (RAPID state, program execution state, etc)
--Read/write the value of an IO signal on the IRC
--Read/write the value of a data symbol (i.e. RAPID var) on the IRC
--Control program execution (start, stop, reset PP)
+-Retrieve the current state of the IRC (RAPID state, program execution state, etc)  
+-Read/write the value of an IO signal on the IRC  
+-Read/write the value of a data symbol (i.e. RAPID var) on the IRC  
+-Control program execution (start, stop, reset PP)  
 
 For more documentation and examples, see https://loupeteam.github.io/LoupeDocs/libraries/a3br.html
 
