@@ -1,7 +1,11 @@
-(*//********************************************************************************
-// Author:    Josh Polansky
-// Created:   January 29, 2020
-//*********************************************************************************)
+(*
+* File: constats.var
+* Copyright (c) 2023 Loupe
+* https://loupe.team
+* 
+* This file is part of A3BR, licensed under the MIT License.
+* 
+*)
 
 FUNCTION_BLOCK A3brWebService (*Establish the initial connection to the IRC, and handle channeling of all HTTP traffic back and forth.*)
 	VAR_INPUT
