@@ -22,8 +22,7 @@ To install using the Loupe Package Manager (LPM), in an initialized Automation S
 
 ## Licensing
 
-This project is primarily licensed under the [MIT License](LICENSE.md). However, it includes components under the [Apple Public Source License (APSL)](LICENSE-APSL.md) and the [Apache Group License](LICENSE-Apache.md). Please refer to the respective files for full license texts.
+This project is primarily licensed under the [MIT License](LICENSE). However, it includes components under the [Apple Public Source License (APSL)](LICENSE-APSL) and the [Apache Group License](LICENSE-Apache). Please refer to the respective files for full license texts.
 
-base64.c : [Apple Public Source License (APSL)](LICENSE-APSL.md) AND [Apache Group License](LICENSE-Apache.md)
-
-base64.h : [Apple Public Source License (APSL)](LICENSE-APSL.md) AND [Apache Group License](LICENSE-Apache.md)
+-base64.c  
+-base64.h
