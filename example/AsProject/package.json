@@ -1,0 +1,26 @@
+{
+  "name": "asproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "lpmConfig": {
+    "deploymentConfigs": [
+      "Config1"
+    ],
+    "gitClient": "GitExtensions"
+  },
+  "dependencies": {
+    "@loupeteam/jsmn_parse": "^1.5.0",
+    "@loupeteam/librarybuilderproject": "^0.3.0",
+    "@loupeteam/llhttp": "^0.1.2",
+    "@loupeteam/ringbuflib": "^0.2.4",
+    "@loupeteam/stringext": "^0.14.4",
+    "@loupeteam/tcpcomm": "^0.10.0"
+  }
+}
