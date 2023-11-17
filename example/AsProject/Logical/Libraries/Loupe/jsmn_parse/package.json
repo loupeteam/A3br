@@ -1,0 +1,18 @@
+{
+  "name": "@loupeteam/jsmn_parse",
+  "version": "1.5.0",
+  "description": "Loupe's jsmn_parse library for Automation Runtime",
+  "homepage": "https://loupeteam.github.io/LoupeDocs/libraries/jsmn_parse.html",
+  "scripts": {},
+  "keywords": [],
+  "author": "Loupe",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/loupeteam/jsmn_parse"
+  },
+  "lpm": {
+    "type": "library"
+  },
+  "dependencies": {}
+}

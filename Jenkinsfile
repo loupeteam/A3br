@@ -1,6 +1,10 @@
-library "jenkinsLibrary@feature/libraryBuilder"
+library "jenkinsLibrary@develop"
 
 buildPublishPipeline(
-   slackChannel: 'lpm-bots',
-   lpmVersion: 'develop'
+    slackChannel: "sandbox-github",
+    asProjectRepo: "A3br",
+    asProjectVersion: "feature/OSSRelease", 
+    asProjectPath: "example/AsProject",
+    skipLpmInstall: true,
+    packagesToPublish: ['src/Ar/A3BR']
 )
