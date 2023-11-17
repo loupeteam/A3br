@@ -7,6 +7,6 @@
     <Object Type="Library" Language="Binary">stringext</Object>
     <Object Type="Library" Language="Binary">jsmn_parse</Object>
     <Object Type="Library" Language="Binary">tcpcomm</Object>
-    <Object Type="Library" Language="ANSIC" Reference="true">C:\Projects\Loupe\A3br\src\Ar\A3BR\ANSIC.lby</Object>
+    <Object Type="Library" Language="ANSIC" Reference="true">..\..\src\Ar\A3BR\ANSIC.lby</Object>
   </Objects>
 </Package>
