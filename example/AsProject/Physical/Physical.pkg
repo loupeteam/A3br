@@ -4,5 +4,6 @@
   <Objects>
     <Object Type="Configuration">ARM</Object>
     <Object Type="Configuration">Intel</Object>
+    <Object Type="Configuration">X20CP3686X</Object>
   </Objects>
 </Physical>
