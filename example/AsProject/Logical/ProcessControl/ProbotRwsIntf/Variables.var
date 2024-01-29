@@ -1,0 +1,17 @@
+(*
+* File: Cyclic.st
+* Copyright (c) 2023 Loupe
+* https://loupe.team
+* 
+* This file is part of PiperModuleTemplate, licensed under the MIT License.
+*)
+
+VAR
+	a3brConnect_0 : A3brWebService;
+	a3brSetIO_0 : A3brSetIO;
+	a3brGetIO_0 : A3brGetIO;
+END_VAR
+
+VAR CONSTANT
+
+END_VAR
