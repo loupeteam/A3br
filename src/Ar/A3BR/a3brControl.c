@@ -76,7 +76,7 @@ void A3brControl(struct A3brControl* inst){
 				brsstrcpy( request.parameters[0].value, "motoron" );
 				break;
 			case A3BR_API_VERSION_2:
-				brsstrcpy( request.uri, "rw/panel/ctrlstate" );
+				brsstrcpy( request.uri, "rw/panel/ctrl-state" );
 				brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
 				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 				brsstrcpy( request.parameters[0].name, "ctrl-state" );
@@ -107,11 +107,22 @@ void A3brControl(struct A3brControl* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST; 
-		brsstrcpy( request.uri, "rw/panel/ctrlstate" );
-		brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
-		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
-		brsstrcpy( request.parameters[0].name, "ctrl-state" );
-		brsstrcpy( request.parameters[0].value, "motoroff" );
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "rw/panel/ctrlstate" );
+				brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsstrcpy( request.parameters[0].name, "ctrl-state" );
+				brsstrcpy( request.parameters[0].value, "motoroff" );
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "rw/panel/ctrl-state" );
+				brsstrcat( request.uri, "?action=setctrlstate&json=1" );	
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsstrcpy( request.parameters[0].name, "ctrl-state" );
+				brsstrcpy( request.parameters[0].value, "motoroff" );
+				break;
+		}
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
 
