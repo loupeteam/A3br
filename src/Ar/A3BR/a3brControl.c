@@ -161,7 +161,8 @@ void A3brControl(struct A3brControl* inst){
 				brsstrcat( request.uri, "?action=start&json=1" );
 				break;
 			case A3BR_API_VERSION_2:
-				brsstrcpy( request.uri, "/rw/rapid/execution/start?mastership=implicit" );
+				brsstrcpy( request.uri, "/rw/rapid/execution/start" );
+				brsstrcat( request.uri, "?mastership=implicit&json=1" );
 				break;
 		}		
 		//Pass in all required parameters for the start command.
@@ -215,12 +216,17 @@ void A3brControl(struct A3brControl* inst){
 				brsstrcat( request.uri, "?action=stop&json=1");	
 				break;
 			case A3BR_API_VERSION_2:
-				brsstrcpy( request.uri, "/rw/rapid/execution/stop?mastership=implicit");
+				brsstrcpy( request.uri, "/rw/rapid/execution/stop");
+				brsstrcat( request.uri, "?json=1");	
 				break;
 		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
+		brsstrcpy( request.parameters[0].name, "stopmode" );
+		brsstrcpy( request.parameters[0].value, "stop" );  //options - {cycle | instr | stop | qstop} 
+		brsstrcpy( request.parameters[1].name, "usetsp" );
+		brsstrcpy( request.parameters[1].value, "normal" );  //options - {normal | alltsk}
 
 		//Pass request to A3brWebService for processing.
 		BufferAddToBottom( &connection->requestBuffer, &request);							
@@ -249,7 +255,8 @@ void A3brControl(struct A3brControl* inst){
 				brsstrcat( request.uri, "?action=resetpp&json=1");	
 				break;
 			case A3BR_API_VERSION_2:
-				brsstrcpy( request.uri, "/rw/rapid/execution/resetpp?mastership=implicit");	
+				brsstrcpy( request.uri, "/rw/rapid/execution/resetpp");	
+				brsstrcat( request.uri, "?mastership=implicit&json=1");	
 				break;
 		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
@@ -278,7 +285,7 @@ void A3brControl(struct A3brControl* inst){
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
 		
-		//Create a folder to hold the new program files.	
+		//Request mastership on all domains i.e. CFG, Motion, and Rapid	
 		request.method = LLHTTP_METHOD_POST; 	
 		switch(connection->apiVersion) {
 			case A3BR_API_VERSION_1:
@@ -312,7 +319,7 @@ void A3brControl(struct A3brControl* inst){
 		request.errorCallback = &A3brControlErrorCallback;
 		request.successCallback = &A3brControlSuccessCallback;
 		
-		//Create a folder to hold the new program files.	
+		//Release mastership on all domains i.e. CFG, Motion, and Rapid		
 		request.method = LLHTTP_METHOD_POST; 
 		switch(connection->apiVersion) {
 			case A3BR_API_VERSION_1:
