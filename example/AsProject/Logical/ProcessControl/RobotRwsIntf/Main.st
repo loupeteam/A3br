@@ -7,51 +7,69 @@
 *)
 
 PROGRAM _INIT
-	a3brConnect_0.enable := TRUE;
-	a3brConnect_0.configuration.hostname := '192.168.125.1';  //specific per robot used
-	//a3brConnect_0.configuration.port := 80;
-	a3brConnect_0.configuration.username := 'admin';// Default User 'admin';  //specific per robot used
-	a3brConnect_0.configuration.password := 'robotics';  //specific per robot used
-	a3brConnect_0.configuration.apiVersion := A3BR_API_VERSION_2;  //Set to Version RWS 2.0 if Robot has a Omnicore processor
-	IF a3brConnect_0.configuration.apiVersion = A3BR_API_VERSION_1 THEN
-		a3brConnect_0.configuration.port := 80;
+	rws.connect.enable := TRUE;
+	rws.connect.configuration.hostname := '192.168.125.1';  //specific per robot used
+	rws.connect.configuration.username := 'admin';// Default User 'admin';  //specific per robot used
+	rws.connect.configuration.password := 'robotics';  //specific per robot used
+	rws.connect.configuration.apiVersion := A3BR_API_VERSION_2;  //Set to Version RWS 2.0 if Robot has a Omnicore processor
+	IF rws.connect.configuration.apiVersion = A3BR_API_VERSION_1 THEN
+		rws.connect.configuration.port := 80;
 	ELSE
-		a3brConnect_0.configuration.port := 443;
+		rws.connect.configuration.port := 443;
 	END_IF
 	
-	a3brSetIO_0.value := 0;
-	 
-	//transferdifference
+	rws.setIO.value := 0;
+	
 END_PROGRAM
 
 PROGRAM _CYCLIC
-	
-	//Add application code inside the connected IF statement
-	IF (a3brConnect_0.connected) THEN
-		IF EDGE(executeSetIO) THEN
-			a3brSetIO_0.execute := TRUE;
-		END_IF
-		
-		//Setting an output signal
-		a3brSetIO_0.ident := a3brConnect_0.ident;
-		a3brSetIO_0.pSignal := ADR('ABB_Scalable_IO_0_DO1');
-		
-		//Reading an input signal
-		a3brGetIO_0.ident := a3brConnect_0.ident;
-		a3brGetIO_0.pSignal := ADR('ABB_Scalable_IO_0_DI1');
-		
+	// Call RWS connection fub
+	rws.connect();
+	// Check to verify that a connection has been established
+	IF (NOT rws.connect.connected) THEN
+		RETURN;
 	END_IF
 	
+	// Setting an output signal
+	IF EDGE(executeSetIO) THEN
+		rws.setIO.execute := TRUE;
+	END_IF
+	rws.setIO.ident := rws.connect.ident;
+	rws.setIO.pSignal := ADR('ABB_Scalable_IO_0_DO1'); //ADR('RAPID/T_ROB1/General/activeAlarm');
+	
+	// Reading an input signal
+	rws.getIO.ident := rws.connect.ident;
+	rws.getIO.pSignal := ADR('I/O System/ABB_Scalable_IO_0_DI1');
+	
+	// Control Robot
+	rws.control.ident := rws.connect.ident;
+	
+	// Get Symbol
+	rws.getSymbol.ident := rws.connect.ident;
+	
+	// IO Watch 
+	rws.ioWatch.ident := rws.connect.ident;
+	
+	// Program Control
+	rws.programControl.ident := rws.connect.ident;
+	
+	// Set Symbol
+	rws.setSymbol.ident := rws.connect.ident;
+	
 	// Call all FUBs. 
-	a3brConnect_0();
-	a3brSetIO_0();
-	a3brGetIO_0();
-	a3brSetIO_0.execute := FALSE;
-	 
+	rws.setIO();
+	rws.setIO.execute := FALSE;
+	rws.getIO();
+	rws.control();
+	rws.getSymbol();
+	rws.ioWatch();
+	rws.programControl();
+	rws.setSymbol();
+
 END_PROGRAM
 
 PROGRAM _EXIT
-	a3brConnect_0.enable := FALSE;
+	rws.connect.enable := FALSE;
 	 
 END_PROGRAM
 

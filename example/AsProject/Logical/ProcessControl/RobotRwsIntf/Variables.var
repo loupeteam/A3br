@@ -8,9 +8,7 @@
 
 VAR
 	executeSetIO : BOOL;
-	a3brConnect_0 : A3brWebService;
-	a3brSetIO_0 : A3brSetIO;
-	a3brGetIO_0 : A3brGetIO;
+	rws : rwsA3br_typ;
 END_VAR
 
 VAR CONSTANT
