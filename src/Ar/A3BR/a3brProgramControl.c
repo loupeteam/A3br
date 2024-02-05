@@ -188,16 +188,28 @@ void A3brProgramControl(struct A3brProgramControl* inst){
 		request.errorCallback = &A3brProgramControlErrorCallback;
 		request.successCallback = &A3brProgramControlSuccessCallback;
 		
-		//Create a folder to hold the new program files.	
-		request.method = LLHTTP_METHOD_POST; 						
-		brsstrcpy( request.uri, "/fileservice/$home/" );
-		brsstrcat( request.uri, "?json=1" );	
-		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
-		brsmemset(&request.parameters, 0, sizeof(request.parameters));
-		brsstrcpy(request.parameters[0].name, "fs-newname");
-		brsstrcpy(request.parameters[0].value, inst->pProgramName);
-		brsstrcpy(request.parameters[1].name, "fs-action");
-		brsstrcpy(request.parameters[1].value, "create");
+		//Create a folder/directory to hold the new program files.	
+		request.method = LLHTTP_METHOD_POST;
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/fileservice/$home/" );
+				brsstrcat( request.uri, "?json=1" );
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsmemset(&request.parameters, 0, sizeof(request.parameters));
+				brsstrcpy(request.parameters[0].name, "fs-newname");
+				brsstrcpy(request.parameters[0].value, inst->pProgramName);
+				brsstrcpy(request.parameters[1].name, "fs-action");
+				brsstrcpy(request.parameters[1].value, "create");
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/fileservice/$home/create" );
+				brsstrcat( request.uri, "?json=1" );
+				request.dataType = A3BR_REQ_DATA_TYPE_PARS;
+				brsmemset(&request.parameters, 0, sizeof(request.parameters));
+				brsstrcpy(request.parameters[0].name, "fs-newname");
+				brsstrcpy(request.parameters[0].value, inst->pProgramName);
+				break;
+		}
 		BufferAddToBottom( &connection->requestBuffer, &request );	
 		
 		//Create the RAPID module file.
@@ -230,12 +242,22 @@ void A3brProgramControl(struct A3brProgramControl* inst){
 		request.szBlock = brsstrlen(pgfData);
 		BufferAddToBottom( &connection->requestBuffer, &request );				
 		
-		//Load the newly created program.
-		request.method = LLHTTP_METHOD_POST; 						
-		brsstrcpy( request.uri, "/rw/rapid/tasks/" );
-		brsstrcat( request.uri, inst->pTaskName );
-		brsstrcat( request.uri, "/program" );
-		brsstrcat( request.uri, "?action=loadprog&json=1" );	
+		//Load (the newly created) program into a rapid task.
+		request.method = LLHTTP_METHOD_POST; 
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/rapid/tasks/" );
+				brsstrcat( request.uri, inst->pTaskName );
+				brsstrcat( request.uri, "/program" );
+				brsstrcat( request.uri, "?action=loadprog&json=1" );	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/rapid/tasks/" );
+				brsstrcat( request.uri, inst->pTaskName );
+				brsstrcat( request.uri, "/program/load" );
+				brsstrcat( request.uri, "?mastership=implicit&json=1" );
+				break;
+		}
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		brsmemset(&request.parameters, 0, sizeof(request.parameters));
 		brsstrcpy( request.parameters[0].name, "progpath" );
