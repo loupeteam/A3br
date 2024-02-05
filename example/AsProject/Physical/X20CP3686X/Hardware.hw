@@ -12,6 +12,7 @@
     <Parameter ID="PermanentPvSize" Value="50000" />
     <Parameter ID="RemanentGlobalPvSize" Value="50000" />
     <Parameter ID="VolatileGlobalPvSize" Value="1000000" />
+    <Parameter ID="Cyclic3Stack" Value="65535" />
     <Group ID="FileDevice1" />
     <Parameter ID="FileDeviceName1" Value="USER" />
     <Parameter ID="FileDevicePath1" Value="USER_PATH" />
