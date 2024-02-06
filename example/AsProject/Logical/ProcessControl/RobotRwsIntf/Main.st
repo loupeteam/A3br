@@ -46,6 +46,10 @@ PROGRAM _CYCLIC
 	
 	// Get Symbol
 	rws.getSymbol.ident := rws.connect.ident;
+	rws.getSymbol.pSignal := ADR('RAPID/T_ROB1/Wizard/cycle');
+	rws.getSymbol.pValue := ADR(cycles);
+	rws.getSymbol.szValue := SIZEOF(cycles);
+	rws.getSymbol.typeValue := A3BR_VAR_TYPE_INT;
 	
 	// IO Watch 
 	rws.ioWatch.ident := rws.connect.ident;
@@ -55,6 +59,10 @@ PROGRAM _CYCLIC
 	
 	// Set Symbol
 	rws.setSymbol.ident := rws.connect.ident;
+	rws.setSymbol.pSignal := ADR('RAPID/T_ROB1/Wizard/robotString');
+	rws.setSymbol.pValue := ADR(sendString);
+	rws.setSymbol.szValue := SIZEOF(sendString);
+	rws.setSymbol.typeValue := A3BR_VAR_TYPE_STRING;
 	
 	// Call all FUBs. 
 	rws.setIO();

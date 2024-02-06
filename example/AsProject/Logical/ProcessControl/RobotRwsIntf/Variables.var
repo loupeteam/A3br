@@ -8,6 +8,8 @@
 
 VAR
 	executeSetIO : BOOL;
+	cycles : INT;
+	sendString : STRING := 'Hello From B&R!!!s';
 	rws : rwsA3br_typ;
 END_VAR
 
