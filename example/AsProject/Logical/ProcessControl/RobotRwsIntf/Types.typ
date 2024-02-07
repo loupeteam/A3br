@@ -11,6 +11,7 @@ TYPE
 		connect : A3brWebService;
 		control : A3brControl;
 		getIO : A3brGetIO;
+		getState : A3brGetState;
 		getSymbol : A3brGetSymbol;
 		ioWatch : A3brIOWatch;
 		programControl : A3brProgramControl;

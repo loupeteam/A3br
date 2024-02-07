@@ -20,6 +20,9 @@ PROGRAM _INIT
 	
 	rws.setIO.value := 0;
 	
+	rws.getState.mode := A3BR_GET_STATE_MODE_CONTINUOUS;
+	rws.getState.cycleTime := 1000; // units are milliseconds
+	
 END_PROGRAM
 
 PROGRAM _CYCLIC
@@ -51,6 +54,9 @@ PROGRAM _CYCLIC
 	rws.getSymbol.szValue := SIZEOF(cycles);
 	rws.getSymbol.typeValue := A3BR_VAR_TYPE_INT;
 	
+	// Get State
+	rws.getState.ident := rws.connect.ident;
+	
 	// IO Watch 
 	rws.ioWatch.ident := rws.connect.ident;
 	
@@ -70,6 +76,7 @@ PROGRAM _CYCLIC
 	rws.getIO();
 	rws.control();
 	rws.getSymbol();
+	rws.getState();
 	rws.ioWatch();
 	rws.programControl();
 	rws.setSymbol();
