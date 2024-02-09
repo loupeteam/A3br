@@ -77,9 +77,19 @@ void A3brSetSymbol(struct A3brSetSymbol* inst){
 		brsmemset(&request, 0, sizeof(request));
 		request.self = inst;
 		request.method = LLHTTP_METHOD_POST; 
-		brsstrcpy( request.uri, "/rw/rapid/symbol/data/");
-		brsstrcat( request.uri, inst->pSignal );
-		brsstrcat( request.uri, "?action=set&json=1" );	
+		switch(connection->apiVersion) {
+			case A3BR_API_VERSION_1:
+				brsstrcpy( request.uri, "/rw/rapid/symbol/data/");
+				brsstrcat( request.uri, inst->pSignal );
+				brsstrcat( request.uri, "?action=set&json=1" );	
+				break;
+			case A3BR_API_VERSION_2:
+				brsstrcpy( request.uri, "/rw/rapid/symbol/");
+				brsstrcat( request.uri, inst->pSignal );
+				brsstrcat( request.uri, "/data?mastership=implicit" );	
+				break;
+		}	
+		
 		request.dataType = A3BR_REQ_DATA_TYPE_PARS;
 		brsstrcpy( request.parameters[0].name, "value" );
 		if(inst->typeValue == A3BR_VAR_TYPE_BOOL) {	
