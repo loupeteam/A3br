@@ -103,7 +103,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 		//Wait for a new request to be placed in the buffer (they get placed here by other blocks in this library).
 		case A3BR_REQUEST_ST_IDLE:
 			inst->connection[i].httpClient.enable = 1;	
-			inst->connection[i].ping.IN = !inst->connection[i].ping.Q;
+			inst->connection[i].ping.IN = 1;
 
 			if (requests->NumberValues > 0)
 			{
@@ -282,7 +282,7 @@ void a3brSession(A3brWebServiceSession_typ *inst, A3brWebServiceCfg_typ *configu
 
 		inst->connection[i].ping.PT = inst->connection[i].ping.PT ? inst->connection[i].ping.PT : 30000;
 		TON(&inst->connection[i].ping);
-		//inst->connection[i].ping.IN = 0;
+		inst->connection[i].ping.IN = 0;
 
 		A3brWebServiceConnection_typ *connection = &inst->connection[i];
 
