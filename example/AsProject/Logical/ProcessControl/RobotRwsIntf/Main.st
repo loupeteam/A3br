@@ -9,7 +9,7 @@
 PROGRAM _INIT
 	rws.connect.enable := TRUE;
 	rws.connect.configuration.hostname := '192.168.125.1';  //specific per robot used
-	rws.connect.configuration.username := 'admin';// Default User 'admin';  //specific per robot used
+	rws.connect.configuration.username := 'Default User';//specific per robot used
 	rws.connect.configuration.password := 'robotics';  //specific per robot used
 	rws.connect.configuration.apiVersion := A3BR_API_VERSION_2;  //Set to Version RWS 2.0 if Robot has a Omnicore processor
 	IF rws.connect.configuration.apiVersion = A3BR_API_VERSION_1 THEN
@@ -19,9 +19,15 @@ PROGRAM _INIT
 	END_IF
 	
 	rws.setIO.value := 0;
-	
+
+	rws.getState.enable := TRUE;
 	rws.getState.mode := A3BR_GET_STATE_MODE_CONTINUOUS;
 	rws.getState.cycleTime := 1000; // units are milliseconds
+	
+	rws.control.cycle := A3BR_RAPID_CYCLE_ST_ONCE;
+	
+	ioSignalPath := 'Local/ABB_Scalable_IO_0_DI1';
+	sizeStringPathCheck := SIZEOF(ioSignalPath);
 	
 END_PROGRAM
 
@@ -34,15 +40,12 @@ PROGRAM _CYCLIC
 	END_IF
 	
 	// Setting an output signal
-	IF EDGE(executeSetIO) THEN
-		rws.setIO.execute := TRUE;
-	END_IF
 	rws.setIO.ident := rws.connect.ident;
-	rws.setIO.pSignal := ADR('ABB_Scalable_IO_0_DO1'); //ADR('RAPID/T_ROB1/General/activeAlarm');
+	rws.setIO.pSignal := ADR(ioSignalPath);
 	
 	// Reading an input signal
 	rws.getIO.ident := rws.connect.ident;
-	rws.getIO.pSignal := ADR('I/O System/ABB_Scalable_IO_0_DI1');
+	rws.getIO.pSignal := ADR(ioSignalPath);
 	
 	// Control Robot
 	rws.control.ident := rws.connect.ident;
@@ -65,14 +68,13 @@ PROGRAM _CYCLIC
 	
 	// Set Symbol
 	rws.setSymbol.ident := rws.connect.ident;
-	rws.setSymbol.pSignal := ADR('RAPID/T_ROB1/Wizard/robotString');
-	rws.setSymbol.pValue := ADR(sendString);
-	rws.setSymbol.szValue := SIZEOF(sendString);
-	rws.setSymbol.typeValue := A3BR_VAR_TYPE_STRING;
+	rws.setSymbol.pSignal := ADR('RAPID/T_ROB1/Wizard/cycle');
+	rws.setSymbol.pValue := ADR(cycles);
+	rws.setSymbol.szValue := SIZEOF(cycles);
+	rws.setSymbol.typeValue := A3BR_VAR_TYPE_INT;
 	
 	// Call all FUBs. 
 	rws.setIO();
-	rws.setIO.execute := FALSE;
 	rws.getIO();
 	rws.control();
 	rws.getSymbol();

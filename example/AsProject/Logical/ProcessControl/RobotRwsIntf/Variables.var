@@ -7,10 +7,11 @@
 *)
 
 VAR
-	executeSetIO : BOOL;
+	ioSignalPath : STRING[79];  (*Required string length for the names of the RAPID data symbols UINT := 80*)
 	cycles : INT;
 	sendString : STRING := 'Hello From B&R!!!s';
 	rws : rwsA3br_typ;
+	sizeStringPathCheck : DINT;
 END_VAR
 
 VAR CONSTANT
