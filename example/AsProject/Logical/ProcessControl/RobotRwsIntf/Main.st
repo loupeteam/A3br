@@ -20,16 +20,19 @@ PROGRAM _INIT
 		rws.connect.configuration.port := 443;
 	END_IF
 	
-	rws.setIO.value := 0;
+	// Init IO Signal
+	//rws.setIO.value := 0;
 
 	rws.getState.enable := TRUE;
 	rws.getState.mode := A3BR_GET_STATE_MODE_CONTINUOUS;
 	rws.getState.cycleTime := 1000; // units are milliseconds
 	
-	rws.control.cycle := A3BR_RAPID_CYCLE_ST_ONCE;
+	// Set RAPID execution mode
+	//rws.control.cycle := A3BR_RAPID_CYCLE_ST_ONCE;
 	
-	ioSignalPath := 'Local/ABB_Scalable_IO_0_DI1';
-	sizeStringPathCheck := SIZEOF(ioSignalPath);
+	// Set signal path and size
+	//ioSignalPath := 'Local/ABB_Scalable_IO_0_DI1';
+	//sizeStringPathCheck := SIZEOF(ioSignalPath);
 	
 END_PROGRAM
 
@@ -42,48 +45,48 @@ PROGRAM _CYCLIC
 	END_IF
 	
 	// Setting an output signal
-	rws.setIO.ident := rws.connect.ident;
-	rws.setIO.pSignal := ADR(ioSignalPath);
+	//rws.setIO.ident := rws.connect.ident;
+	//rws.setIO.pSignal := ADR(ioSignalPath);
 	
 	// Reading an input signal
-	rws.getIO.ident := rws.connect.ident;
-	rws.getIO.pSignal := ADR(ioSignalPath);
+	//rws.getIO.ident := rws.connect.ident;
+	//rws.getIO.pSignal := ADR(ioSignalPath);
 	
 	// Control Robot
-	rws.control.ident := rws.connect.ident;
+	//rws.control.ident := rws.connect.ident;
 	
 	// Get Symbol
-	rws.getSymbol.ident := rws.connect.ident;
-	rws.getSymbol.pSignal := ADR('RAPID/T_ROB1/Wizard/cycle');
-	rws.getSymbol.pValue := ADR(cycles);
-	rws.getSymbol.szValue := SIZEOF(cycles);
-	rws.getSymbol.typeValue := A3BR_VAR_TYPE_INT;
+	//rws.getSymbol.ident := rws.connect.ident;
+	//rws.getSymbol.pSignal := ADR('RAPID/T_ROB1/Wizard/cycle');
+	//rws.getSymbol.pValue := ADR(cycles);
+	//rws.getSymbol.szValue := SIZEOF(cycles);
+	//rws.getSymbol.typeValue := A3BR_VAR_TYPE_INT;
 	
 	// Get State
 	rws.getState.ident := rws.connect.ident;
 	
 	// IO Watch 
-	rws.ioWatch.ident := rws.connect.ident;
+	//rws.ioWatch.ident := rws.connect.ident;
 	
 	// Program Control
-	rws.programControl.ident := rws.connect.ident;
+	//rws.programControl.ident := rws.connect.ident;
 	
 	// Set Symbol
-	rws.setSymbol.ident := rws.connect.ident;
-	rws.setSymbol.pSignal := ADR('RAPID/T_ROB1/Wizard/cycle');
-	rws.setSymbol.pValue := ADR(cycles);
-	rws.setSymbol.szValue := SIZEOF(cycles);
-	rws.setSymbol.typeValue := A3BR_VAR_TYPE_INT;
+	//rws.setSymbol.ident := rws.connect.ident;
+	//rws.setSymbol.pSignal := ADR('RAPID/T_ROB1/Wizard/cycle');
+	//rws.setSymbol.pValue := ADR(cycles);
+	//rws.setSymbol.szValue := SIZEOF(cycles);
+	//rws.setSymbol.typeValue := A3BR_VAR_TYPE_INT;
 	
 	// Call all FUBs. 
-	rws.setIO();
-	rws.getIO();
-	rws.control();
-	rws.getSymbol();
+	//rws.setIO();
+	//rws.getIO();
+	//rws.control();
+	//rws.getSymbol();
 	rws.getState();
-	rws.ioWatch();
-	rws.programControl();
-	rws.setSymbol();
+	//rws.ioWatch();
+	//rws.programControl();
+	//rws.setSymbol();
 
 END_PROGRAM
 
