@@ -13,8 +13,10 @@ PROGRAM _INIT
 	rws.connect.configuration.password := 'robotics';  //specific per robot used
 	rws.connect.configuration.apiVersion := A3BR_API_VERSION_2;  //Set to Version RWS 2.0 if Robot has a Omnicore processor
 	IF rws.connect.configuration.apiVersion = A3BR_API_VERSION_1 THEN
+		// RWS API v1.0 uses HTTP and is able use port 80
 		rws.connect.configuration.port := 80;
 	ELSE
+		// RWS API v2.0 uses HTTPS and thus requires port 443
 		rws.connect.configuration.port := 443;
 	END_IF
 	
