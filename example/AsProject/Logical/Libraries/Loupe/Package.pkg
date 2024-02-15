@@ -1,12 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<?AutomationStudio FileVersion="4.9"?>
+<?xml version='1.0' encoding='utf-8'?>
 <Package xmlns="http://br-automation.co.at/AS/Package">
   <Objects>
+    <Object Type="Library" Language="Binary">jsmn_parse</Object>
+    <Object Type="Library" Language="ANSIC" Reference="true">..\..\src\Ar\A3BR\ANSIC.lby</Object>
     <Object Type="Library" Language="Binary">llhttp</Object>
+    <Object Type="Library" Language="Binary">tcpcomm</Object>
     <Object Type="Library" Language="Binary">ringbuflib</Object>
     <Object Type="Library" Language="Binary">stringext</Object>
-    <Object Type="Library" Language="Binary">jsmn_parse</Object>
-    <Object Type="Library" Language="Binary">tcpcomm</Object>
-    <Object Type="Library" Language="ANSIC" Reference="true">..\..\src\Ar\A3BR\ANSIC.lby</Object>
   </Objects>
 </Package>

@@ -1,14 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Library xmlns="http://br-automation.co.at/AS/Library" Version="0.01.2" SubType="Binary">
+<Library xmlns="http://br-automation.co.at/AS/Library" Version="0.01.4" SubType="Binary">
   <Files>
-    <File>README.md</File>
-    <File>LICENSE.md</File>
     <File Description="Exported data types">Types.typ</File>
     <File Description="Exported constants">Constants.var</File>
     <File Description="Exported functions and function blocks">LLHttp.fun</File>
     <File>picohttpparser.h</File>
     <File>HttpUtility.h</File>
     <File>LLHttpH.h</File>
+    <File Type="File">CHANGELOG.md</File>
   </Files>
   <Dependencies>
     <Dependency ObjectName="TCPComm" />
