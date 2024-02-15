@@ -1,0 +1,28 @@
+{
+  "name": "@loupeteam/a3brprog",
+  "version": "0.1.0",
+  "description": "This is a program package that will add the Robot RWS Interface Program to your AS project",
+  "author": "Loupe",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loupeteam/A3br"
+  },
+  "dependencies": {
+    "@loupeteam/a3br": "^0.4.2"
+  },
+  "lpm": {
+    "type": "program",
+    "logical": {
+      "destination": "ProcessControl"
+    },
+    "physical": {
+      "cpu": [
+        {
+          "source": "RobotRwsIntf",
+          "destination": "TC4"
+        }
+      ]
+    }
+  }
+}
