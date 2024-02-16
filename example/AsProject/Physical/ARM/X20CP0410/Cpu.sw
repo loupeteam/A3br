@@ -1,14 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <?AutomationStudio FileVersion="4.9"?>
 <SwConfiguration CpuAddress="SL1" xmlns="http://br-automation.co.at/AS/SwConfiguration">
-  <TaskClass Name="Cyclic#1" />
+  <TaskClass Name="Cyclic#1">
+    <Task Name="Default" Source="" Memory="UserROM" Language="Binary" Debugging="true" />
+  </TaskClass>
   <TaskClass Name="Cyclic#2" />
   <TaskClass Name="Cyclic#3" />
-  <TaskClass Name="Cyclic#4" />
+  <TaskClass Name="Cyclic#4">
+    <Task Name="RobotRwsIn" Source="ProcessControl.RobotRwsIntf.prg" Memory="UserROM" Language="IEC" Debugging="true" />
+  </TaskClass>
   <TaskClass Name="Cyclic#5" />
   <TaskClass Name="Cyclic#6" />
   <TaskClass Name="Cyclic#7" />
   <TaskClass Name="Cyclic#8" />
+  <DataObjects>
+    <DataObject Name="arnc0sys" Source="" Memory="UserROM" Language="Binary" />
+    <DataObject Name="Acp10sys" Source="" Memory="UserROM" Language="Binary" />
+  </DataObjects>
   <NcDataObjects>
     <NcDataObject Name="gmcipvar" Source="Libraries.Motion.GmcIpUserConfig.gmcipvar.dob" Memory="UserROM" Language="Cnc" />
     <NcDataObject Name="gmcipfun" Source="Libraries.Motion.GmcIpUserConfig.gmcipfun.dob" Memory="UserROM" Language="Cnc" />
@@ -34,6 +42,10 @@
     <BinaryObject Name="FWRules" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="TCData" Source="" Memory="SystemROM" Language="Binary" />
     <BinaryObject Name="udbdef" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="Acp10map" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="arnc0cfg" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="Arnc0map" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="acp10cfg" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="iomap" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="asfw" Source="" Memory="SystemROM" Language="Binary" />
     <BinaryObject Name="Role" Source="" Memory="UserROM" Language="Binary" />
@@ -96,5 +108,7 @@
     <LibraryObject Name="jsmn_parse" Source="Libraries.Loupe.jsmn_parse.lby" Memory="UserROM" Language="Binary" Debugging="true" />
     <LibraryObject Name="tcpcomm" Source="Libraries.Loupe.tcpcomm.lby" Memory="UserROM" Language="Binary" Debugging="true" />
     <LibraryObject Name="A3BR" Source="Libraries.Loupe.A3BR.lby" Memory="UserROM" Language="ANSIC" Debugging="true" />
+    <LibraryObject Name="llhttp" Source="Libraries.Loupe.llhttp.lby" Memory="UserROM" Language="Binary" Debugging="true" />
+    <LibraryObject Name="powerlnk" Source="" Memory="UserROM" Language="Binary" Debugging="true" />
   </Libraries>
 </SwConfiguration>
