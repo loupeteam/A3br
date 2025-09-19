@@ -53,5 +53,6 @@
     <LibraryObject Name="jsmn_parse" Source="Libraries.Loupe.jsmn_parse.lby" Memory="UserROM" Language="Binary" Debugging="true" />
     <LibraryObject Name="tcpcomm" Source="Libraries.Loupe.tcpcomm.lby" Memory="UserROM" Language="Binary" Debugging="true" />
     <LibraryObject Name="A3BR" Source="Libraries.Loupe.A3BR.lby" Memory="UserROM" Language="ANSIC" Debugging="true" />
+    <LibraryObject Name="llhttp" Source="Libraries.Loupe.llhttp.lby" Memory="UserROM" Language="Binary" Debugging="true" />
   </Libraries>
 </SwConfiguration>
