@@ -1,18 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Library xmlns="http://br-automation.co.at/AS/Library" Version="0.01.4" SubType="Binary">
+<Library xmlns="http://br-automation.co.at/AS/Library" Version="1.0.0" SubType="Binary">
   <Files>
     <File Description="Exported data types">Types.typ</File>
     <File Description="Exported constants">Constants.var</File>
     <File Description="Exported functions and function blocks">LLHttp.fun</File>
-    <File>picohttpparser.h</File>
-    <File>HttpUtility.h</File>
-    <File>LLHttpH.h</File>
-    <File Type="File">CHANGELOG.md</File>
-  </Files>
+    </Files>
   <Dependencies>
-    <Dependency ObjectName="TCPComm" />
-    <Dependency ObjectName="RingBufLib" />
+    <Dependency ObjectName="TCPComm" FromVersion="1.0.0" />
+    <Dependency ObjectName="RingBufLib" FromVersion="1.0.0" />
     <Dependency ObjectName="standard" />
-    <Dependency ObjectName="StringExt" />
+    <Dependency ObjectName="StringExt" FromVersion="1.0.0" />
   </Dependencies>
 </Library>
