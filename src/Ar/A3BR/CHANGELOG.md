@@ -1,5 +1,9 @@
 # Change log
 
+- 1.0.0:
+    - Migrate to Automation Studio 6 (AS6)
+    - Update Loupe dependencies: jsmn_parse >=2.0.0, RingBufLib >=1.0.0, StringExt >=1.0.0, LLHttp >=1.0.0
+
 - 0.4.0:
 	- Add initial support for RWS2.0 (i.e. the version that ships with Omnicore robots)
 	- NOTE that the only supported blocks with 2.0 currently are GetIO, SetIO, GetSymbol, SetSymbol, and GetState.

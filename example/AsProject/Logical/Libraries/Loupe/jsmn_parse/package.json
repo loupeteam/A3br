@@ -1,7 +1,7 @@
 {
   "name": "@loupeteam/jsmn_parse",
-  "version": "1.5.0",
-  "description": "Loupe's jsmn_parse library for Automation Runtime",
+  "version": "2.0.0",
+  "description": "JSON parsing library for B&R Automation Studio (jsmn-based)",
   "homepage": "https://loupeteam.github.io/LoupeDocs/libraries/jsmn_parse.html",
   "scripts": {},
   "keywords": [],
